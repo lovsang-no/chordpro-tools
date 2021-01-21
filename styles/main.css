@@ -1,0 +1,251 @@
+/* font-family: 'Open Sans', sans-serif;
+font-family: 'Roboto Mono', monospace; */
+
+:root {
+  --border-color: var(--c-dark20);
+  --border-width: 1px;
+  --border: var(--border-width) solid var(--border-color);
+  --border-radius: 1em;
+  --font-main: 'Open Sans', sans-serif;
+  --font-mono: 'Roboto Mono', monospace;
+
+  --font-size-base: 16px;
+
+  --background-color-main: var(--c-dark10);
+
+  --c-text-main: #222222;
+  --c-text-white: var(--background-color-main);
+
+  --c-dark00: #ffffff;
+  --c-dark10: #fdfdfd;
+  --c-dark20: #dddddd;
+  --c-dark30: #aaaaaa;
+  --c-dark50: #888888;
+  --c-dark70: #555555;
+  --c-dark80: #333333;
+  --c-dark90: #222222;
+
+  --c-main-accent: #f29559;
+}
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-main);
+  font-size: var(--font-size-base);
+  color: var(--c-text-main);
+  background-color: var(--background-color-main);
+}
+
+body > * {
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+footer {
+  margin-top: auto;
+}
+
+.main-wrapper {
+  padding: 2em;
+  height: 100%;
+  display: grid;
+  gap: 2em;
+  grid-template-rows: auto 1fr auto;
+  position: relative;
+}
+
+.background-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.background-overlay:before {
+  content: '';
+  position: absolute;
+  top: -10vh;
+  left: -20vw;
+  width: 200vw;
+  height: 55vh;
+  transform: rotateZ(-2deg);
+  z-index: -1;
+  background-color: var(--c-main-accent);
+  box-shadow: 1px 1px 20px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  margin: 0;
+  font-family: var(--font-main);
+  font-size: 4em;
+  text-indent: -0.06em;
+}
+
+a,
+a:hover,
+a:active,
+a:visited {
+  color: inherit;
+}
+
+.github-icon {
+  position: fixed;
+  top: 0.5em;
+  right: 0.5em;
+  font-size: 3em;
+  line-height: 0;
+  color: var(--c-dark70);
+}
+
+.github-icon:hover {
+  color: var(--c-dark50);
+}
+
+#target {
+  align-self: stretch;
+}
+
+.boxes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 1fr auto;
+  gap: 2em;
+}
+
+.box {
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  background-color: var(--c-dark00);
+  box-shadow: 2px 2px 30px rgba(0, 0, 0, 0.1);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  position: relative;
+  font-size: var(--font-size-base);
+}
+
+.box-label {
+  border-bottom: var(--border);
+  text-align: center;
+  padding: 0.5em;
+  font-size: 1em;
+  text-transform: uppercase;
+  color: var(--c-dark30);
+}
+
+label {
+  margin: 0;
+  padding: 0;
+  display: block;
+}
+
+.box-content {
+  padding: 1.5em;
+}
+
+.h100 {
+  height: 100%;
+}
+
+.w100 {
+  width: 100%;
+}
+
+textarea {
+  border: none;
+  outline: none;
+  resize: none;
+  height: 200px;
+  font-size: var(--font-size-base);
+  font-family: var(--font-mono);
+  color: var(--c-text-main);
+  background-color: inherit;
+}
+
+.action-wrapper {
+  grid-column: 1 / span 3;
+  display: flex;
+  justify-content: center;
+}
+
+button {
+  border: none;
+  background-color: inherit;
+  font-size: 1em;
+  color: inherit;
+  outline: none;
+  padding: inherit;
+  margin: inherit;
+}
+
+.button-wrapper {
+  margin: 0 0em;
+  overflow: hidden;
+  transition: transform 200ms ease;
+}
+
+.button-wrapper:hover {
+  transform: scale(1.04);
+}
+
+.button-wrapper:active {
+  transform: scale(0.96);
+}
+
+button {
+  background-color: var(--c-main-accent);
+  color: var(--c-text-main);
+  padding: 0.5em 0 0.5em 0.5em;
+  margin: 0 1.9em;
+  position: relative;
+  text-transform: uppercase;
+  font-weight: 500;
+  font-size: 1em;
+}
+
+button::before {
+  content: '';
+  height: 5em;
+  width: 4em;
+  background-color: inherit;
+  position: absolute;
+  top: -0.4em;
+  left: -1em;
+  z-index: -1;
+  transform: rotateZ(30deg);
+}
+
+button::after {
+  content: '';
+  height: 4em;
+  width: 4em;
+  background-color: inherit;
+  position: absolute;
+  top: -1.4em;
+  right: -1.2em;
+  z-index: -1;
+  transform: rotateZ(30deg);
+}
+
+.flex-v {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-grow {
+  flex-grow: 1;
+}
+
+.flex-h {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
