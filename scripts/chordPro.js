@@ -120,21 +120,7 @@ function parseChordPro(template, key, mode = 0, transpose = 0, print) {
       return 'XX';
     });
   };
-  var isChord = (word) => {
-    var res = false;
-    if (word)
-      all_keys.forEach((chord) => {
-        if (word.startsWith(chord)) res = true;
-        if (
-          word.length > 1 &&
-          word.charAt(0).toLowerCase() == word.charAt(1).toLowerCase()
-        ) {
-          if (word.startsWith('Bb')) res = true;
-          if (word.startsWith('Aadd')) res = true;
-        }
-      });
-    return res;
-  };
+
   var nashville_chord = function (chord, mode) {
     var regex = /([A-Z][b#]?)/g;
     var new_chord = chord.replace(regex, function ($1) {
