@@ -149,7 +149,9 @@ const genLayout = (target) => {
   };
 
   chordproInput.oninput = (e) => {
-    // TODO: Implement update on chord sheet
+    let template = e.target.value;
+    resultDiv.innerHTML = parseChordPro(template, getKeyFromTemplate(template));
+    sheetInput.value = cpToSheet(template, getKeyFromTemplate(template)).result;
   };
 
   button.onclick = () => {
@@ -159,6 +161,81 @@ const genLayout = (target) => {
   /* Append to #target */
   target.innerHTML = '';
   target.appendChild(app);
+
+  const template = `
+Verse
+[B]The Lord bless you[E] and keep you
+[B/D#]Make His face shine u[F#sus]pon you
+And be gracious to [G#m]you
+The Lord turn His[E] face toward you
+[B/D#]And [F#sus]give you [B]peace 
+
+Interlude
+[| B / / / | Bsus / / / |]
+REPEAT VERSE
+Chorus
+[G#m7]A  - [E]men
+A[B]men, A[F#]men
+[G#m7]A  - [E]men
+A[B]men, A[F#]men
+
+REPEAT VERSE
+REPEAT CHORUS X2
+Interlude
+[| G#m7 / / / | E / / / | B / / / | F# / / / |]
+
+Bridge 1
+May His [G#m7]favor be upon you
+And a [E]thousand generations
+And your [B]family and your children
+And their [F#]children and their children
+
+May His [G#m7]favor be upon you
+And a [E]thousand generations
+And your [B]family and your children
+And their [F#]children and their children
+
+REPEAT BRIDGE 1
+
+Bridge 2
+May His [G#m7]presence go before you
+And [E]behind you and beside you
+All a[B]round you and within you
+He is [F#]with you he is with you
+
+In the [G#m7]morning in the evening
+In your [E]coming and your going
+In your [B]weeping and rejoicing 
+He is [F#]for you He is for you
+
+Tag
+He is [G#m7]for you He is for you
+He is [E]for you He is for you
+He is [B]for you He is for you
+He is [F#]for you He is for you
+
+REPEAT CHORUS
+
+Bridge 3
+May His [G#m7]favor be upon you
+And a [E]thousand generations
+And your [B]family and your children
+And their [F#]children and their children
+
+May His [G#m7]presence go before you
+And [E]behind you and beside you
+All a[B]round you and within you
+He is [F#]with you he is with you
+
+In the [G#m7]morning in the evening
+In your [E]coming and your going
+In your [B]weeping and rejoicing 
+He is [F#]for you He is for you
+
+REPEAT CHORUS & BRIDGE Freely
+  `;
+  chordproInput.value = template;
+  sheetInput.value = cpToSheet(template, getKeyFromTemplate(template)).result;
 };
 
 const target = document.querySelector('#target');
