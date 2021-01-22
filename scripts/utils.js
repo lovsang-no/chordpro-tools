@@ -9,6 +9,20 @@ String.prototype.wrapChord = function () {
   return '[' + this + ']';
 };
 
+String.prototype.wrapHTML = function (DOMElement, elClass = '') {
+  return (
+    '<' +
+    DOMElement +
+    ' class="' +
+    elClass +
+    '">' +
+    this +
+    '</' +
+    DOMElement +
+    '>'
+  );
+};
+
 String.prototype.unwrapChord = function () {
   return this.slice(1, -1);
 };
@@ -19,6 +33,15 @@ String.prototype.erase = function (from, to = 1) {
     ' '.repeat(to + from <= this.length ? to : this.length - from) +
     this.slice(from + Math.abs(to))
   );
+};
+
+const isCPOneLiner = (line) => {
+  const items = line.split(' ');
+  for (let i = 0; i < items.length; i++) {
+    let chord = items[i];
+    if (!(chord.startsWith('[') && chord.endsWith(']'))) return false;
+  }
+  return true;
 };
 
 const all_keys = [
@@ -95,6 +118,7 @@ const isChord = (word) => {
 const spaces = (number, space = ' ') => {
   return space.repeat(number);
 };
+
 /* 
 const all_test_chords = [
   'A',
@@ -121,3 +145,11 @@ all_test_chords.forEach((chord) => {
   console.log(chord, 'isChord: ', isChord(chord));
 });
  */
+
+const newElement = (element, ...classes) => {
+  const el = document.createElement(element);
+  classes.forEach((c) => {
+    el.classList.add(c);
+  });
+  return el;
+};

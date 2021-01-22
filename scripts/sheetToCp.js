@@ -12,7 +12,6 @@ const isChordLine = (line) => {
 
 const isAcceptedOneLineParts = (word) => {
   const acceptedOneLineParts = ['|', '/', '-', '.', '(x', '(X', 'x', 'X'];
-  console.log(word);
   for (let i = 0; i < acceptedOneLineParts.length; i++) {
     let acceptedPart = acceptedOneLineParts[i];
     if (word.startsWith(acceptedPart)) return true;
