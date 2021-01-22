@@ -249,3 +249,7 @@ button::after {
   width: 100%;
   justify-content: center;
 }
+
+.overflow-scroll {
+  overflow: auto;
+}

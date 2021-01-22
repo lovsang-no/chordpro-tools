@@ -1,11 +1,3 @@
-const newElement = (element, ...classes) => {
-  const el = document.createElement(element);
-  classes.forEach((c) => {
-    el.classList.add(c);
-  });
-  return el;
-};
-
 const genInputBoxes = (...classes) => {
   const boxValues = [
     {
@@ -56,9 +48,14 @@ const genResultBox = () => {
   };
 
   const controlsWrapper = newElement('DIV', 'flex-h');
-  const resultDiv = newElement('DIV', 'flex-grow', 'w100');
+  const resultDiv = newElement('DIV', 'flex-grow', 'w100', 'result-wrapper');
 
-  const boxContent = newElement('DIV', 'box-content', 'flex-v');
+  const boxContent = newElement(
+    'DIV',
+    'box-content',
+    'flex-v',
+    'overflow-scroll'
+  );
   boxContent.appendChild(controlsWrapper);
   boxContent.appendChild(resultDiv);
   const boxLabel = newElement('DIV', 'box-label');
@@ -145,12 +142,18 @@ const genLayout = (target) => {
   sheetInput.oninput = (e) => {
     let template = e.target.value;
     chordproInput.value = sheetToCp(template);
-    resultDiv.innerHTML = parseChordPro(template, getKeyFromTemplate(template));
+    resultDiv.innerHTML = parseChordPro(
+      chordproInput.value,
+      getKeyFromTemplate(chordproInput.value)
+    ).result;
   };
 
   chordproInput.oninput = (e) => {
     let template = e.target.value;
-    resultDiv.innerHTML = parseChordPro(template, getKeyFromTemplate(template));
+    resultDiv.innerHTML = parseChordPro(
+      template,
+      getKeyFromTemplate(template)
+    ).result;
     sheetInput.value = cpToSheet(template, getKeyFromTemplate(template)).result;
   };
 
@@ -162,128 +165,46 @@ const genLayout = (target) => {
   target.innerHTML = '';
   target.appendChild(app);
 
-  /*   const template = `The Blessing
-Kari Jobe
-Key: B
-Tempo: 90
+  const template = `Jeg vil følge
+Impuls
+Key: D
+Tempo: 86 BPM
 Time: 4/4
 
-Verse:
-B                 E
-The Lord bless you and keep you
-B/D#                 F#sus
-Make His face shine upon you
-                    G#m
-And be gracious to you
-                  E
-The Lord turn His face toward you
-B/D#F#sus    B
-And give you peace 
+[|] [D] [-] [-] [-] [|] [D/] [C#] [-] [-] [-] [|] [Bm7] [-] [-] [-] [|] [G] [-] [-] [-] [|]
 
-Interlude
+Vers 1:
+D[D]u kom til m[D/C#]eg og jeg fikk s[G]e hvem du var
+[Em]Jesus Guds sønn
+[Bm7]Du viste m[Bm7/A]eg veien du g[G]ikk for min skyld 
+Din d[Em]ød ble mitt liv
 
-| B / / / | Bsus / / / |
-REPEAT VERSE
-Chorus
-G#m7 E
-A  - men
-  B      F#
-Amen, Amen
-G#m7 E
-A  - men
-  B      F#
-Amen, Amen
+Bro:
+[Bm7]Og Jesus h[G]er står jeg ved ditt k[D]ors
+og hører du [D/C#]kaller navnet m[Bm7]itt
+Og Jesus h[G]er står jeg ved ditt k[D]ors
+og hører du k[G]aller meg, k[F#sus]aller me[F#]g
 
-REPEAT VERSE
-REPEAT CHORUS X2
-Interlude
+Refreng:
+Til å fø[Bm7]lge deg hvor e[G]nn du går
+Jesus [D]du ga meg alt å [Asus4]leve for[A]
+Da d[Bm7]u ble korsfestet ble je[G]g satt fri
+For [E]se jeg var død men har [Asus4]nå fått li[A]v
+Jeg vil [E]følge deg, 
+Jesus [G]du som har all fremtid for m[D]eg[D/C#] [Bm7] [G]
 
-| G#m7 / / / | E / / / | B / / / | F# / / / |
-
-Bridge 1
-        G#m7
-May His favor be upon you
-      E
-And a thousand generations
-          B
-And your family and your children
-          F#
-And their children and their children
-
-        G#m7
-May His favor be upon you
-      E
-And a thousand generations
-          B
-And your family and your children
-          F#
-And their children and their children
-
-REPEAT BRIDGE 1
-
-Bridge 2
-        G#m7
-May His presence go before you
-    E
-And behind you and beside you
-      B
-All around you and within you
-      F#
-He is with you he is with you
-
-        G#m7
-In the morning in the evening
-        E
-In your coming and your going
-        B
-In your weeping and rejoicing 
-      F#
-He is for you He is for you
-
-Tag
-      G#m7
-He is for you He is for you
-      E
-He is for you He is for you
-      B
-He is for you He is for you
-      F#
-He is for you He is for you
-
-REPEAT CHORUS
-
-Bridge 3
-        G#m7
-May His favor be upon you
-      E
-And a thousand generations
-          B
-And your family and your children
-          F#
-And their children and their children
-
-        G#m7
-May His presence go before you
-    E
-And behind you and beside you
-      B
-All around you and within you
-      F#
-He is with you he is with you
-
-        G#m7
-In the morning in the evening
-        E
-In your coming and your going
-        B
-In your weeping and rejoicing 
-      F#
-He is for you He is for you
-
-REPEAT CHORUS & BRIDGE Freely
+Vers 2:
+D[D]u som kom [D/C#]fra, et liv i h[G]erlighet, 
+[Em]fornedret deg selv
+[Bm7]Du forlot a[Bm7/A]lt, himmel og t[G]rone for meg, 
+en f[Em]remmed du ble
   `;
-  sheetInput.value = template;
-  chordproInput.value = sheetToCp(template); */
+  chordproInput.value = template;
+  sheetInput.value = cpToSheet(template).result;
+  resultDiv.innerHTML = parseChordPro(
+    template,
+    getKeyFromTemplate(template)
+  ).result;
 };
 
 const target = document.querySelector('#target');
