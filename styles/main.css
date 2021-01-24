@@ -47,6 +47,14 @@ body > * {
   flex-shrink: 0;
 }
 
+header > a {
+  font-size: 2em;
+  margin-top: 0.4em;
+  font-weight: 200;
+  cursor: pointer;
+  display: inline-block;
+}
+
 footer {
   margin-top: auto;
 }
@@ -117,7 +125,7 @@ a:visited {
 .boxes-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: 1fr auto;
+  grid-template-rows: 1fr;
   gap: 2em;
 }
 
@@ -130,15 +138,28 @@ a:visited {
   grid-template-rows: auto 1fr;
   position: relative;
   font-size: var(--font-size-base);
+  min-height: 30em;
 }
 
 .box-label {
+  position: relative;
   border-bottom: var(--border);
   text-align: center;
   padding: 0.5em;
   font-size: 1em;
   text-transform: uppercase;
   color: var(--c-dark30);
+}
+
+.box-label > a {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8em;
+  color: var(--c-text-main);
+  right: 1em;
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 label {
@@ -201,14 +222,15 @@ button {
 }
 
 button {
-  background-color: var(--c-main-accent);
-  color: var(--c-text-main);
-  padding: 0.5em 0 0.5em 0.5em;
+  background-color: var(--c-dark90);
+  color: var(--c-text-white);
+  padding: 0.5em 1em;
   margin: 0 1.9em;
-  position: relative;
   text-transform: uppercase;
   font-weight: 500;
   font-size: 1em;
+  overflow: hidden;
+  position: relative;
 }
 
 button::before {
@@ -252,4 +274,41 @@ button::after {
 
 .overflow-scroll {
   overflow: auto;
+}
+
+.result-wrapper {
+  position: relative;
+}
+
+.cp-error-message {
+  background-color: rgba(253, 253, 253, 0.7);
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: -1.5em;
+  display: grid;
+  place-items: center;
+  font-size: 1em;
+  padding: 10%;
+}
+
+.cp-welcome::before {
+  content: 'Velkommen!\A\A Du starter ved å begynne å skrive i en av boksene eller trykke på "Vis meg et eksempel".\A\A Blekken må starte med\A\A        Tittel \A        Artist \A        Key: C';
+  white-space: pre-wrap;
+}
+
+.cp-key-error::before {
+  content: 'Ugyldig toneart.\A\A';
+  white-space: pre-wrap;
+}
+
+.cp-no-key::before {
+  content: 'Toneart mangler. Angi toneart på tredje linje som f.eks. "Key: C"\A\A';
+  white-space: pre-wrap;
+}
+
+.cp-section {
+  border: 1px solid transparent;
 }

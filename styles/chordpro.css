@@ -14,8 +14,9 @@ td {
   font-weight: bold;
 }
 
-.cp-section {
-  border: 1px solid lightgray;
+.cp-section,
+.cp-meta-wrapper {
+  margin: 0;
 }
 
 .cp-heading {
@@ -25,8 +26,4 @@ td {
 .cp-chord {
   font-weight: bold;
   color: red;
-}
-
-.cp-meta-wrapper {
-  font-size: 1.2em;
 }

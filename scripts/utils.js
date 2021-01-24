@@ -149,7 +149,7 @@ all_test_chords.forEach((chord) => {
 const newElement = (element, ...classes) => {
   const el = document.createElement(element);
   classes.forEach((c) => {
-    el.classList.add(c);
+    if (c.trim() !== '') el.classList.add(c);
   });
   return el;
 };

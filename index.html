@@ -34,78 +34,13 @@
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div class="main-wrapper">
-      <div class="background-overlay"></div>
-      <header>
-        <h1>Chord Sheet til ChordPro</h1>
-        <a
-          href="https://github.com/mholta"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="github-icon"
-          ><i class="fab fa-github"></i
-        ></a>
-      </header>
-      <div id="target">
-        You need to enable JavaScript to run this app.
-        <div class="h100">
-          <form action="" class="h100">
-            <div class="boxes-grid h100">
-              <label for="sheetInput" class="label">
-                <div class="box h100">
-                  <div class="box-label">Akkorder over tekst</div>
-                  <div class="box-content">
-                    <textarea
-                      name="sheetInput"
-                      id="sheetInput"
-                      class="h100 w100"
-                      placeholder="Lim inn akkorder over tekst"
-                    ></textarea>
-                  </div>
-                </div>
-              </label>
-              <label for="chordProInput" class="label">
-                <div class="box h100">
-                  <div class="box-label">ChordPro</div>
-                  <div class="box-content">
-                    <textarea
-                      name="chordProInput"
-                      id="chordProInput"
-                      class="h100 w100"
-                      placeholder="Lim inn akkorder i klammeparantes"
-                    ></textarea>
-                  </div>
-                </div>
-              </label>
 
-              <div class="box h100">
-                <div class="box-label">Forhåndsvisning</div>
-                <div class="box-content flex-v">
-                  <div class="flex-h">[CONTROLS FOR TESTING CHORDS]</div>
-                  <textarea
-                    name="previewInput"
-                    id="previewInput"
-                    class="flex-grow w100"
-                    placeholder="Forhåndsvisning"
-                  ></textarea>
-                </div>
-              </div>
-
-              <div class="action-wrapper">
-                <div class="button-wrapper">
-                  <button>Last ned ChordPro som .txt</button>
-                </div>
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+    <div id="target">You need to enable JavaScript to run this app.</div>
 
     <script src="scripts/utils.js"></script>
-    <script src="scripts/chordPro.js"></script>
     <script src="scripts/sheetToCp.js"></script>
     <script src="scripts/cpToSheet.js"></script>
+    <script src="scripts/chordPro class.js"></script>
     <script src="scripts/main.js"></script>
   </body>
 </html>
