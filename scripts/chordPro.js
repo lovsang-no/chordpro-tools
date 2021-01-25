@@ -51,7 +51,6 @@ const parseChordPro = (template, parseTable = true) => {
             pair['lyrics'] = word === '' ? undefined : word;
           }
         });
-        console.log(pairs);
         /* Parse table */
         if (parseTable) {
           let tableBuffer = [];

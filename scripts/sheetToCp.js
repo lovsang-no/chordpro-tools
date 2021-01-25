@@ -22,7 +22,7 @@ const isAcceptedOneLineParts = (word) => {
 const checkAndFixOneLiner = (line) => {
   line = line.trim().replace(/  +/g, ' ');
   /* Supporting |chord, ||, --, .., // (and combinations) */
-  const regex = /(((\-|\.|\||\/)(C|D|E|F|G|A|B|\d)))|((\-|\.|\||\/){2})/gi;
+  const regex = /(( (\-|\.|\||\/)(C|D|E|F|G|A|B|\d)))|((\-|\.|\||\/){2})/gi;
   let fixIndex;
   fixIndex = line.search(regex);
   if (fixIndex !== -1) {
@@ -75,7 +75,7 @@ const sheetToCp = (template) => {
     } else if (!justMergedWithLyrics) {
       if (line.trim() !== '' && isChordLine(line)) {
         /* One liner */
-        if (isOneLiner(line)) {
+        if (isOneLiner(line) || (isChordLine(line) && !lines[linenum + 1])) {
           const oneLineBuffer = [];
           let list = checkAndFixOneLiner(line).split(' ');
           list.forEach((element) => {
@@ -88,6 +88,8 @@ const sheetToCp = (template) => {
           if (!isChordLine(nextLine)) {
             const chords = getChordsList(line);
             let lyricsLine = nextLine;
+            if (lyricsLine.length < line.length)
+              lyricsLine += spaces(line.length - lyricsLine.length - 1);
             /* Adding chords backwards */
             chords.reverse().forEach((chordObj) => {
               lyricsLine = lyricsLine.splice(
