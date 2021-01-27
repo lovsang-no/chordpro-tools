@@ -100,12 +100,14 @@ class SongEdit extends Song {
           )
             mainBuffer.push(section.parse(parseTable) + br);
         });
-      } else if (!this.logicWrapper.key) {
-        mainBuffer.push(''.wrapHTML('div', 'cp-error-message cp-no-key'));
-      } else {
-        mainBuffer.push(''.wrapHTML('div', 'cp-error-message cp-key-error'));
+      } else if (this.linesCount > 3) {
+        if (!this.logicWrapper.key) {
+          mainBuffer.push(''.wrapHTML('div', 'cp-error-message cp-no-key'));
+        } else {
+          mainBuffer.push(''.wrapHTML('div', 'cp-error-message cp-key-error'));
+        }
       }
-    } else {
+    } else if (!this.metadata.artist || this.metadata.title === '') {
       mainBuffer.push(''.wrapHTML('div', 'cp-error-message cp-welcome'));
     }
     target.innerHTML = mainBuffer.join('\n');

@@ -140,6 +140,7 @@ class Song {
     this.metadata = new MetaData();
     this.sections = [];
     this.parseTargets = new Map();
+    this.linesCount = 0;
     if (template) this.intialize(template);
   }
 
@@ -206,6 +207,8 @@ class Song {
       .trim()
       .split('\n')
       .forEach((line, linenum) => {
+        this.linesCount++;
+
         /* One liner */
         if (isCPOneLiner(line)) {
           let oneLineBuffer = [];
@@ -319,6 +322,7 @@ class Song {
   }
 
   reInitialize(template) {
+    this.linesCount = 0;
     this.sections = [];
     this.logicWrapper = new LogicWrapper();
     this.metadata = new MetaData();
