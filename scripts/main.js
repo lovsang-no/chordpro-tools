@@ -479,7 +479,7 @@ const genLayout = (target) => {
   appWrapper.appendChild(backgroundOverlay);
 
   const header = newElement('HEADER');
-  const titleH1 = `<h1>Lag blekke til lovsang.no</h1>`;
+  const titleH1 = `<h1>Lag blekke til Lovsang.no</h1>`;
   header.innerHTML += titleH1;
 
   appWrapper.appendChild(header);

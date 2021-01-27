@@ -84,7 +84,22 @@ const all_chords = [
   'Ab',
 ];
 
-const chordColoring = ['sus', 'add', 'maj', 'min', '/', '('];
+const chordColoring = [
+  'sus',
+  'add',
+  'maj',
+  'min',
+  '/',
+  '(',
+  'dim',
+  '+',
+  'omit',
+  'M',
+  'ø',
+  'o',
+  'aug',
+  '-',
+];
 
 const isChord = (word) => {
   if (word)
