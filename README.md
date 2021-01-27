@@ -29,3 +29,5 @@ song.parseNashville()
 ```javascript
 song.reInitialize(template)
 ```
+
+Huge thank's to @gulaker for helping out in the early stages and with the logic behind this script.
