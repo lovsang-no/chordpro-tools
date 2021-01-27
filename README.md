@@ -1,3 +1,31 @@
-# chordpro-converter
+# ChordPro-converter
 
-Webapp for converting chord sheets with chords over text to ChordPro bracket format. Allows for downloading result as .txt file.
+Simple Vanilla JS app for creating chord charts and converting to ChordPro bracketed format.
+
+### Initalize Song object
+```javascript
+const song = new Song(template)
+```
+
+### Parse as HTML text using spaces
+```javascript
+song.parsePlainHTML(DOMElement)
+```
+
+### Parse as table
+```javascript
+song.parseHTMLTable(DOMElement)
+```
+
+### Change whats being parsed 
+Default: chords
+```javascript
+song.parseChords()
+song.parseLyrics()
+song.parseNashville()
+```
+
+### Update template
+```javascript
+song.reInitialize(template)
+```
