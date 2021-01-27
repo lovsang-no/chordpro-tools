@@ -481,14 +481,6 @@ const genLayout = (target) => {
   const header = newElement('HEADER');
   const titleH1 = `<h1>Lag blekke til lovsang.no</h1>`;
   header.innerHTML += titleH1;
-  const gitHubIcon = `<a
-  href="https://github.com/mholta"
-  target="_blank"
-  rel="noopener noreferrer"
-  class="github-icon"
-  ><i class="fab fa-github"></i
-></a>`;
-  header.innerHTML += gitHubIcon;
 
   appWrapper.appendChild(header);
 
