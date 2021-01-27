@@ -84,7 +84,7 @@ footer {
   top: -10vh;
   left: -20vw;
   width: 200vw;
-  height: 55vh;
+  height: 70vh;
   transform: rotateZ(-2deg);
   z-index: -1;
   background-color: var(--c-main-accent);
@@ -118,15 +118,21 @@ a:visited {
   color: var(--c-dark50);
 }
 
-#target {
-  align-self: stretch;
-}
-
 .boxes-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: 1fr;
   gap: 2em;
+  margin-bottom: 5vh;
+}
+.boxes-grid.w3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+.boxes-grid.w2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+.boxes-grid.w1 {
+  grid-template-columns: repeat(1, 1fr);
 }
 
 .box {
@@ -135,6 +141,7 @@ a:visited {
   background-color: var(--c-dark00);
   box-shadow: 2px 2px 30px rgba(0, 0, 0, 0.1);
   display: grid;
+  align-self: stretch;
   grid-template-rows: auto 1fr;
   position: relative;
   font-size: var(--font-size-base);
@@ -166,6 +173,7 @@ label {
   margin: 0;
   padding: 0;
   display: block;
+  align-self: stretch;
 }
 
 .box-content {
@@ -205,20 +213,15 @@ button {
   outline: none;
   padding: inherit;
   margin: inherit;
+  transition: transform 200ms ease, opacity 200ms ease;
 }
 
-.button-wrapper {
-  margin: 0 0em;
-  overflow: hidden;
-  transition: transform 200ms ease;
+button:hover {
+  transform: scale(1.02);
 }
 
-.button-wrapper:hover {
-  transform: scale(1.04);
-}
-
-.button-wrapper:active {
-  transform: scale(0.96);
+button:active {
+  transform: scale(0.98);
 }
 
 button {
@@ -229,32 +232,7 @@ button {
   text-transform: uppercase;
   font-weight: 500;
   font-size: 1em;
-  overflow: hidden;
   position: relative;
-}
-
-button::before {
-  content: '';
-  height: 5em;
-  width: 4em;
-  background-color: inherit;
-  position: absolute;
-  top: -0.4em;
-  left: -1em;
-  z-index: -1;
-  transform: rotateZ(30deg);
-}
-
-button::after {
-  content: '';
-  height: 4em;
-  width: 4em;
-  background-color: inherit;
-  position: absolute;
-  top: -1.4em;
-  right: -1.2em;
-  z-index: -1;
-  transform: rotateZ(30deg);
 }
 
 .flex-v {
@@ -276,18 +254,13 @@ button::after {
   overflow: auto;
 }
 
-.result-wrapper {
-  position: relative;
-}
-
 .cp-error-message {
   background-color: rgba(253, 253, 253, 0.7);
   position: absolute;
-  top: 0;
+  top: 3em;
   right: 0;
   bottom: 0;
   left: 0;
-  margin: -1.5em;
   display: grid;
   place-items: center;
   font-size: 1em;
@@ -309,6 +282,104 @@ button::after {
   white-space: pre-wrap;
 }
 
-.cp-section {
-  border: 1px solid transparent;
+.panel-wrapper {
+  padding: 0.7em 1.5em 1.3em 1.5em;
+  border: 1px solid var(--c-dark20);
+  background-color: var(--c-dark00);
+  margin-bottom: 2em;
+  border-radius: var(--border-radius);
+}
+
+.panel-grid-top {
+  display: grid;
+  grid-template-columns: 6em 1fr auto;
+  column-gap: 2em;
+}
+
+.panel-grid-top > * {
+  align-self: stretch;
+}
+
+.transpose-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr;
+  column-gap: 1em;
+  align-content: stretch;
+  grid-template-rows: min-content;
+}
+
+.transpose-wrapper > div:first-child {
+  grid-column: span 3;
+}
+
+.transpose-wrapper > button {
+  display: block;
+  align-self: stretch;
+  margin: 0;
+}
+
+.file-settings-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 10em;
+  grid-template-rows: auto 1fr;
+  column-gap: 0.6em;
+}
+
+.file-settings-wrapper > div:first-child {
+  grid-column: span 2;
+}
+
+.file-settings-wrapper > input {
+  display: block;
+  outline: none;
+  border: none;
+  border: 1px solid var(--c-text-main);
+  border-radius: 0;
+  margin: 0;
+  padding: 0.4em;
+  font-size: 1em;
+  font-family: var(--font-main);
+  min-width: 5em;
+}
+
+.file-settings-wrapper > button {
+  margin: 0;
+  display: block;
+}
+
+.visability-wrapper {
+  grid-column: span 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1em;
+}
+
+.section-button {
+  background-color: transparent;
+  border: 1px solid var(--c-text-main);
+  border-radius: 0.1em;
+  margin: 0;
+  color: var(--c-text-main);
+}
+
+button.not-active {
+  opacity: 0.5;
+}
+
+.vis-wrapper {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
+}
+
+@media only screen and (max-width: 1130px) {
+  .panel-grid-top > div:nth-child(3) {
+    grid-column: span 2;
+  }
+  .panel-grid-top {
+    display: grid;
+    grid-template-columns: 6em 1fr;
+    row-gap: 1em;
+  }
 }

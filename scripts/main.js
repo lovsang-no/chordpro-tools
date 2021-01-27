@@ -1,6 +1,7 @@
 const getHelperStyles = () => {
   const styles = `
-  .cp-meta-wrapper {
+  .cp-meta-wrapper,
+  .cp-section {
     position: relative;
     margin: 0;
     border: 1px solid lightgray;
@@ -13,12 +14,6 @@ const getHelperStyles = () => {
     top: -1.5em;
     font-size: 0.7em;
     font-weight: bold;
-  }
-  
-  .cp-section {
-    position: relative;
-    margin: 0;
-    border: 1px solid lightgray;
   }
   
   .cp-section::before {
@@ -250,6 +245,16 @@ class SongEdit extends Song {
     }
     /* Append to target */
   }
+  generateFileName() {
+    return (
+      (this.metadata.title ?? '') +
+      ' - ' +
+      (this.metadata.artist ?? '') +
+      ' (' +
+      (this.logicWrapper.currentKey ?? '') +
+      ')'
+    );
+  }
 }
 
 const genInputBoxes = (...classes) => {
@@ -302,7 +307,13 @@ const genResultBox = () => {
   };
 
   const controlsWrapper = newElement('DIV', 'flex-h');
-  const resultDiv = newElement('DIV', 'flex-grow', 'w100', 'result-wrapper');
+  const resultDiv = newElement(
+    'DIV',
+    'flex-grow',
+    'w100',
+    'h100',
+    'result-wrapper'
+  );
 
   const boxContent = newElement(
     'DIV',
@@ -322,7 +333,9 @@ const genResultBox = () => {
   boxLabel.appendChild(showDetailsButton);
   boxLabel.appendChild(hideDetailsButton);
   const styleElement = getHelperStyles();
-  document.head.appendChild(styleElement);
+  setTimeout(() => {
+    document.head.appendChild(styleElement);
+  }, 10);
   showDetailsButton.style.display = 'none';
   showDetailsButton.onclick = () => {
     showDetailsButton.style.display = 'none';
@@ -345,17 +358,10 @@ const genResultBox = () => {
   };
 };
 
-const generateFileName = (textareaValue) => {
-  const lines = textareaValue.split('\n');
-  return (
-    lines[0] + ' - ' + lines[1] + ' (' + lines[2].split(':')[1].trim() + ')'
-  );
-};
-
-const saveTextAsFile = (textToWrite) => {
+const saveTextAsFile = (textToWrite, filename) => {
   /* Source: https://stackoverflow.com/questions/21479107/saving-html5-textarea-contents-to-file/42864235  */
   const textFileAsBlob = new Blob([textToWrite], { type: 'text/plain' });
-  const fileNameToSaveAs = generateFileName(textToWrite) + '.txt'; //filename.extension
+  const fileNameToSaveAs = filename + '.txt'; //filename.extension
 
   const downloadLink = document.createElement('a');
   downloadLink.download = fileNameToSaveAs;
@@ -410,6 +416,62 @@ Hvilken godhet du øste på meg
 
 const exampleHoldUserContent = { cp: '' };
 
+const genPanel = () => {
+  const panelWrapper = newElement('DIV', 'panel-wrapper');
+  const topGrid = newElement('DIV', 'panel-grid-top');
+  panelWrapper.appendChild(topGrid);
+  const transposeWrapper = newElement('DIV', 'transpose-wrapper');
+  topGrid.appendChild(transposeWrapper);
+  transposeWrapper.innerHTML = `<div>Tansponér</div>`;
+  const transposeButtonUp = newElement('BUTTON');
+  const transposeButtonDown = newElement('BUTTON');
+  transposeButtonUp.innerHTML = `<i class="fas fa-angle-up"></i>`;
+  transposeButtonDown.innerHTML = `<i class="fas fa-angle-down"></i>`;
+  transposeWrapper.appendChild(transposeButtonUp);
+  transposeWrapper.appendChild(transposeButtonDown);
+
+  const fileDownloadWrapper = newElement('DIV', 'file-settings-wrapper');
+  topGrid.appendChild(fileDownloadWrapper);
+  fileDownloadWrapper.innerHTML = `<div>Filnavn</div>`;
+  const fileNameInput = newElement('INPUT');
+  fileDownloadWrapper.appendChild(fileNameInput);
+  const fileDownloadButton = newElement('BUTTON');
+  fileDownloadWrapper.appendChild(fileDownloadButton);
+  fileDownloadButton.innerHTML = 'Last ned fil';
+  fileDownloadButton.autocomplete = 'off';
+  fileDownloadButton.autocorrect = 'off';
+  fileDownloadButton.autocapitalize = 'off';
+  fileDownloadButton.spellcheck = 'false';
+
+  const sectionVisWrappWrapp = newElement('DIV', 'vis-wrapper');
+  sectionVisWrappWrapp.innerHTML = '<div>Visningsvalg</div>';
+  const sectionVisibilityWrapper = newElement('DIV', 'visability-wrapper');
+  sectionVisWrappWrapp.appendChild(sectionVisibilityWrapper);
+  topGrid.appendChild(sectionVisWrappWrapp);
+  const chordProBoxButton = newElement('BUTTON', 'section-button');
+  const sheetBoxButton = newElement('BUTTON', 'section-button');
+  const resultBoxButton = newElement('BUTTON', 'section-button');
+  chordProBoxButton.innerHTML = 'ChordPro';
+  sheetBoxButton.innerHTML = 'Over tekst';
+  resultBoxButton.innerHTML = 'Forhåndsvisning';
+  sectionVisibilityWrapper.appendChild(chordProBoxButton);
+  sectionVisibilityWrapper.appendChild(sheetBoxButton);
+  sectionVisibilityWrapper.appendChild(resultBoxButton);
+
+  return {
+    wrapper: panelWrapper,
+    transposeUp: transposeButtonUp,
+    transposeDown: transposeButtonDown,
+    fileNameInput: fileNameInput,
+    downloadButton: fileDownloadButton,
+    visibility: {
+      chordpro: { DOMElement: chordProBoxButton, visible: true },
+      sheet: { DOMElement: sheetBoxButton, visible: true },
+      result: { DOMElement: resultBoxButton, visible: true },
+    },
+  };
+};
+
 const genLayout = (target) => {
   const appWrapper = newElement('DIV', 'main-wrapper');
 
@@ -417,7 +479,7 @@ const genLayout = (target) => {
   appWrapper.appendChild(backgroundOverlay);
 
   const header = newElement('HEADER');
-  const titleH1 = `<h1>Lag blekke</h1>`;
+  const titleH1 = `<h1>Lag blekke til lovsang.no</h1>`;
   header.innerHTML += titleH1;
   const gitHubIcon = `<a
   href="https://github.com/mholta"
@@ -436,18 +498,7 @@ const genLayout = (target) => {
     e.preventDefault();
   };
 
-  const downloadButton = newElement('BUTTON');
-  downloadButton.innerHTML = 'Last ned ChordPro som .txt';
-
-  const controlsWrapper = newElement('BUTTON', 'controls-wrapper');
-  const transposeUpButton = newElement('BUTTON');
-  const transposeDownButton = newElement('BUTTON');
-  controlsWrapper.appendChild(transposeUpButton);
-  controlsWrapper.appendChild(transposeDownButton);
-  transposeUpButton.innerHTML = '+';
-  transposeDownButton.innerHTML = '-';
-
-  const boxesWrapper = newElement('DIV', 'boxes-grid', 'h100');
+  const boxesWrapper = newElement('DIV', 'boxes-grid');
   const inputBoxes = genInputBoxes('h100', 'w100');
   inputBoxes.forEach((boxObj) => {
     boxesWrapper.appendChild(boxObj.DOMElement);
@@ -455,6 +506,8 @@ const genLayout = (target) => {
   const resultBoxObj = genResultBox();
   boxesWrapper.appendChild(resultBoxObj.DOMelement);
 
+  const panel = genPanel(header);
+  form.appendChild(panel.wrapper);
   form.appendChild(boxesWrapper);
   appWrapper.appendChild(form);
 
@@ -487,27 +540,28 @@ const genLayout = (target) => {
     const template = chordproInput.value;
     sheetInput.value = cpToSheet(template).result;
     song.reInitialize(template);
+    panel.fileNameInput.value = song.generateFileName();
   };
   header.appendChild(showExampleButton);
   header.appendChild(hideExampleButton);
-  header.appendChild(downloadButton);
-  header.appendChild(controlsWrapper);
 
-  const song = new SongEdit(templateTest);
+  const song = new SongEdit();
   song.parseHTMLTable(resultDiv);
 
   /* Event handlers START */
   sheetInput.oninput = (e) => {
     chordproInput.value = sheetToCp(e.target.value);
     song.reInitialize(chordproInput.value);
+    panel.fileNameInput.value = song.generateFileName();
   };
 
   chordproInput.oninput = (e) => {
     cpInputChanged();
   };
 
-  downloadButton.onclick = () => {
-    if (chordproInput.value.trim() !== '') saveTextAsFile(chordproInput.value);
+  panel.downloadButton.onclick = () => {
+    if (chordproInput.value.trim() !== '')
+      saveTextAsFile(chordproInput.value, panel.fileNameInput.value);
   };
   /* Event handlers END */
 
@@ -527,9 +581,65 @@ const genLayout = (target) => {
     chordproInput.value = song.parseTransposedChordPro();
     sheetInput.value = song.parsePlainText();
     song.reInitialize(chordproInput.value);
+    panel.fileNameInput.value = song.generateFileName();
   };
-  transposeUpButton.onclick = transposeAllUp;
-  transposeDownButton.onclick = transposeAllDown;
+  panel.transposeUp.onclick = transposeAllUp;
+  panel.transposeDown.onclick = transposeAllDown;
+
+  const updateVisibility = () => {
+    const chordproBtn = panel.visibility.chordpro;
+    const sheetBtn = panel.visibility.sheet;
+    const resultBtn = panel.visibility.result;
+    let countVisible = 0;
+    if (chordproBtn.visible) {
+      chordproBtn.DOMElement.classList.remove('not-active');
+      inputBoxes[0].DOMElement.style.display = 'block';
+      countVisible++;
+    } else {
+      console.log(inputBoxes[0]);
+      chordproBtn.DOMElement.classList.add('not-active');
+      inputBoxes[0].DOMElement.style.display = 'none';
+    }
+    if (sheetBtn.visible) {
+      sheetBtn.DOMElement.classList.remove('not-active');
+      inputBoxes[1].DOMElement.style.display = 'block';
+      countVisible++;
+    } else {
+      sheetBtn.DOMElement.classList.add('not-active');
+      inputBoxes[1].DOMElement.style.display = 'none';
+    }
+    if (resultBtn.visible) {
+      resultBtn.DOMElement.classList.remove('not-active');
+      resultBoxObj.DOMelement.style.display = 'block';
+      countVisible++;
+    } else {
+      resultBtn.DOMElement.classList.add('not-active');
+      resultBoxObj.DOMelement.style.display = 'none';
+    }
+
+    for (let i = 1; i <= 3; i++) {
+      boxesWrapper.classList.remove('w' + i);
+      if (i === countVisible) boxesWrapper.classList.add('w' + countVisible);
+    }
+  };
+
+  panel.visibility.chordpro.DOMElement.onclick = () => {
+    if (panel.visibility.chordpro.visible)
+      panel.visibility.chordpro.visible = false;
+    else panel.visibility.chordpro.visible = true;
+    updateVisibility();
+  };
+  panel.visibility.sheet.DOMElement.onclick = () => {
+    if (panel.visibility.sheet.visible) panel.visibility.sheet.visible = false;
+    else panel.visibility.sheet.visible = true;
+    updateVisibility();
+  };
+  panel.visibility.result.DOMElement.onclick = () => {
+    if (panel.visibility.result.visible)
+      panel.visibility.result.visible = false;
+    else panel.visibility.result.visible = true;
+    updateVisibility();
+  };
 };
 
 const target = document.querySelector('#target');
