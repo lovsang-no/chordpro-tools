@@ -36,7 +36,7 @@ String.prototype.erase = function (from, to = 1) {
 };
 
 const isCPOneLiner = (line) => {
-  const items = line.split(' ');
+  const items = line.replace(/ +/, ' ').split(' ');
   for (let i = 0; i < items.length; i++) {
     let chord = items[i];
     if (!(chord.startsWith('[') && chord.endsWith(']'))) return false;

@@ -422,7 +422,7 @@ const genPanel = () => {
   panelWrapper.appendChild(topGrid);
   const transposeWrapper = newElement('DIV', 'transpose-wrapper');
   topGrid.appendChild(transposeWrapper);
-  transposeWrapper.innerHTML = `<div>Tansponér</div>`;
+  transposeWrapper.innerHTML = `<div>Transponér</div>`;
   const transposeButtonUp = newElement('BUTTON');
   const transposeButtonDown = newElement('BUTTON');
   transposeButtonUp.innerHTML = `<i class="fas fa-angle-up"></i>`;
