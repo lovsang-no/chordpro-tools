@@ -110,14 +110,14 @@ const isChord = (word) => {
           return true;
         }
 
-        for (let i = 0; i <= 10; i++) {
-          if (word.startsWith(chord + i) || word.startsWith(chord + 'm' + i)) {
+        for (let n = 0; n <= 10; n++) {
+          if (word.startsWith(chord + n) || word.startsWith(chord + 'm' + n)) {
             return true;
           }
         }
 
-        for (let i = 0; i < chordColoring.length; i++) {
-          let currentColor = chordColoring[i];
+        for (let j = 0; j < chordColoring.length; j++) {
+          let currentColor = chordColoring[j];
           if (
             word.startsWith(chord + currentColor) ||
             word.startsWith(chord + 'm' + currentColor)
@@ -243,7 +243,7 @@ class Song {
           this.getCurrentSection().addLine(songLine);
         } /* Line is blank or not containing chords */ else {
           /* Format meta data in a nice way */
-          const metaRegex = /^(Key|key|Tempo|tempo|Time|time):\s*(.*)/;
+          const metaRegex = /^(key|tempo|time|published|copyright|web|album):\s*(.*)/i;
           if (!meta_section_passed && line.match(metaRegex)) {
             const matches = line.match(metaRegex, 'i');
 
@@ -270,6 +270,22 @@ class Song {
                 case 'Time':
                 case 'time':
                   this.metadata.time = text;
+                  break;
+                case 'Published':
+                case 'published':
+                  this.metadata.published = text;
+                  break;
+                case 'Web':
+                case 'web':
+                  this.metadata.web = text;
+                  break;
+                case 'Copyright':
+                case 'copyright':
+                  this.metadata.copyright = text;
+                  break;
+                case 'Album':
+                case 'album':
+                  this.metadata.album = text;
                   break;
               }
             }

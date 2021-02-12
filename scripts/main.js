@@ -61,6 +61,7 @@ class SongEdit extends Song {
       return;
     }
     const mainBuffer = [];
+    const copyrightBuffer = [];
     const br = '<br>';
     if (this.intialized && this.metadata.title.length !== 0) {
       /* Add meta data */
@@ -81,6 +82,32 @@ class SongEdit extends Song {
         );
       for (let [key, value] of this.metadata.extra) {
         metaBuffer.push((key + ': ' + value).wrapHTML('div'));
+      }
+      if (
+        this.metadata.published &&
+        this.metadata.copyright &&
+        this.metadata.album
+      ) {
+        copyrightBuffer.push(
+          lang.copyright.main
+            .replaceAll(PUBLISH_YEAR, this.metadata.published)
+            .replaceAll(COPYRIGHT, this.metadata.copyright)
+            .replaceAll(SONG_TITLE, this.metadata.title)
+            .replaceAll(
+              ARTIST_NAME,
+              this.metadata.artist.trim().endsWith('s')
+                ? this.metadata.artist.trim()
+                : this.metadata.artist.trim() + 's'
+            )
+            .replaceAll(ALBUM_NAME, this.metadata.album)
+            .replaceAll('\n', '</br>')
+        );
+      }
+      if (this.metadata.web) {
+        copyrightBuffer.push('</br>');
+        copyrightBuffer.push(
+          lang.copyright.moreInfo.replaceAll(WEB_PAGE, this.metadata.web)
+        );
       }
 
       mainBuffer.push(
@@ -108,7 +135,10 @@ class SongEdit extends Song {
     } else {
       mainBuffer.push(''.wrapHTML('div', 'cp-error-message cp-welcome'));
     }
-    target.innerHTML = mainBuffer.join('\n');
+    mainBuffer.push(
+      copyrightBuffer.join('\n').wrapHTML('DIV', 'cp-copyright-wrapper')
+    );
+    target.innerHTML = mainBuffer.join('\n').wrapHTML('DIV', 'cp-wrapper');
     /* Append to target */
   }
 
@@ -165,7 +195,45 @@ class SongEdit extends Song {
       return mainBuffer.join('\n');
     }
   }
-
+  parseTransposedChordProOnlyChords() {
+    const mainBuffer = [];
+    const br = '<br>';
+    if (this.intialized && this.metadata.title.length !== 0) {
+      /* Add sections */
+      if (this.logicWrapper?.currentKey) {
+        this.sections.forEach((section) => {
+          if (section.title) mainBuffer.push(section.title);
+          section.lines?.forEach((line) => {
+            let lineBuffer = [];
+            switch (line.TYPE) {
+              case 'ONELINE':
+                lineBuffer = [];
+                line.oneLine.forEach((e) => {
+                  if (e instanceof Chord)
+                    lineBuffer.push('[' + e.transposedChord() + ']');
+                  else lineBuffer.push('[' + e + ']');
+                });
+                mainBuffer.push(lineBuffer.join(' '));
+                break;
+              case 'LYRICS':
+                mainBuffer.push(line.lyrics);
+                break;
+              case 'LYRICS_AND_CHORDS':
+                lineBuffer = [];
+                line.pairs.forEach((pair) => {
+                  if (pair.chord)
+                    lineBuffer.push('[' + pair.chord.transposedChord() + ']');
+                  if (pair.lyrics) lineBuffer.push(pair.lyrics);
+                });
+                mainBuffer.push(lineBuffer.join(''));
+            }
+          });
+          mainBuffer.push('');
+        });
+      }
+      return mainBuffer.join('\n');
+    }
+  }
   parsePlainText() {
     const mainBuffer = [];
     const br = '<br>';
@@ -257,107 +325,6 @@ class SongEdit extends Song {
   }
 }
 
-const genInputBoxes = (...classes) => {
-  const boxValues = [
-    {
-      name: 'cpInput',
-      placeholder: `Tittel...`,
-      label: 'ChordPro',
-    },
-    {
-      name: 'sheetInput',
-      placeholder: `Tittel...`,
-      label: 'Akkorder over tekst',
-    },
-  ];
-
-  const boxesObj = [];
-
-  boxValues.forEach((boxValues) => {
-    const textarea = newElement('TEXTAREA', ...classes);
-    textarea.name = boxValues.name;
-    textarea.id = boxValues.name;
-    textarea.placeholder = boxValues.placeholder;
-
-    const boxContent = newElement('DIV', 'box-content');
-    boxContent.appendChild(textarea);
-    const boxLabel = newElement('DIV', 'box-label');
-    boxLabel.innerHTML = boxValues.label;
-
-    const box = newElement('DIV', 'box', 'h100');
-    box.appendChild(boxLabel);
-    box.appendChild(boxContent);
-
-    const label = newElement('LABEL', 'label');
-    label.for = boxValues.name;
-
-    label.appendChild(box);
-
-    boxesObj.push({ DOMElement: label, textarea: textarea });
-  });
-
-  return boxesObj;
-};
-
-const genResultBox = () => {
-  const boxValue = {
-    name: 'result',
-    placeholder: 'Her kommer forhåndsvisning',
-    label: 'Forhåndsvisning',
-  };
-
-  const controlsWrapper = newElement('DIV', 'flex-h');
-  const resultDiv = newElement(
-    'DIV',
-    'flex-grow',
-    'w100',
-    'h100',
-    'result-wrapper'
-  );
-
-  const boxContent = newElement(
-    'DIV',
-    'box-content',
-    'flex-v',
-    'overflow-scroll'
-  );
-  boxContent.appendChild(controlsWrapper);
-  boxContent.appendChild(resultDiv);
-  const boxLabel = newElement('DIV', 'box-label');
-  boxLabel.innerHTML = boxValue.label;
-
-  const showDetailsButton = newElement('a');
-  const hideDetailsButton = newElement('a');
-  showDetailsButton.innerHTML = 'Vis detaljer';
-  hideDetailsButton.innerHTML = 'Skjul detaljer';
-  boxLabel.appendChild(showDetailsButton);
-  boxLabel.appendChild(hideDetailsButton);
-  const styleElement = getHelperStyles();
-  setTimeout(() => {
-    document.head.appendChild(styleElement);
-  }, 10);
-  showDetailsButton.style.display = 'none';
-  showDetailsButton.onclick = () => {
-    showDetailsButton.style.display = 'none';
-    hideDetailsButton.style.display = 'inline-block';
-    document.head.appendChild(styleElement);
-  };
-  hideDetailsButton.onclick = () => {
-    showDetailsButton.style.display = 'inline-block';
-    hideDetailsButton.style.display = 'none';
-    document.head.removeChild(styleElement);
-  };
-
-  const box = newElement('DIV', 'box', 'h100');
-  box.appendChild(boxLabel);
-  box.appendChild(boxContent);
-
-  return {
-    DOMelement: box,
-    resultDiv: resultDiv,
-  };
-};
-
 const saveTextAsFile = (textToWrite, filename) => {
   /* Source: https://stackoverflow.com/questions/21479107/saving-html5-textarea-contents-to-file/42864235  */
   const textFileAsBlob = new Blob([textToWrite], { type: 'text/plain' });
@@ -390,249 +357,549 @@ const newButton = (text) => {
   return { wrapper: buttonWrapper, button: button };
 };
 
-const exampleContent = `Gi meg Jesus
-David André Østby
-Key: G
-Tempo: 82
-Time: 4/4
+const userContent = [];
 
-[|] [G] [-] [-] [-] [|] [D] [-] [-] [-] [|] [Am] [-] [-] [-] [|] [C] [-] [-] [-] [|] [x2]
+const KEY_VALIDATION = 'key_validation';
+const TEMPO_VALIDATION = 'tempo_validation';
+const NOT_EMPTY = 'not_empty';
 
-Vers 1:
-[G]Hvem kan lyse opp min sti
-Som en [Am]lykt for min f[Em]ot
-Gjøre natten om til dag
-Og gi meg nytt [D]mot
+const generateHelperStyleSheetSwitch = () => {
+  const showDetailsButton = newElement('a');
+  const hideDetailsButton = newElement('a');
+  showDetailsButton.innerHTML = lang.helperSheet.show;
+  hideDetailsButton.innerHTML = lang.helperSheet.hide;
+  const styleElement = getHelperStyles();
+  setTimeout(() => {
+    document.head.appendChild(styleElement);
+  }, 10);
+  showDetailsButton.style.display = 'none';
+  showDetailsButton.onclick = () => {
+    showDetailsButton.style.display = 'none';
+    hideDetailsButton.style.display = 'inline-block';
+    document.head.appendChild(styleElement);
+  };
+  hideDetailsButton.onclick = () => {
+    showDetailsButton.style.display = 'inline-block';
+    hideDetailsButton.style.display = 'none';
+    document.head.removeChild(styleElement);
+  };
 
-Bro:
-[Bm]Du ga meg alt
-[D/F#]All min [G]skyld er betalt
-[Am]Mine [Bm]synder ble båret av [D]deg
+  return {
+    show: showDetailsButton,
+    hide: hideDetailsButton,
+  };
+};
 
-Ord blir for små
-Hvem kan fullt ut forstå
-Hvilken godhet du øste på meg
-`;
+const adjustKey = (input) => {
+  switch (input.innerText) {
+    case 'A#':
+      input.innerText = 'Bb';
+      break;
+    case 'D#':
+      input.innerText = 'Eb';
+      break;
+    case 'E#':
+      input.innerText = 'F';
+      break;
+    case 'G#':
+      input.innerText = 'G#';
+      break;
+  }
+};
 
-const exampleHoldUserContent = { cp: '' };
+const generateChordProSectionObject = () => {
+  const section = newElement('SECTION');
+  const containerGrid = newElement('DIV', 'box-grid', 'container', 'wide');
 
-const genPanel = () => {
-  const panelWrapper = newElement('DIV', 'panel-wrapper');
-  const topGrid = newElement('DIV', 'panel-grid-top');
-  panelWrapper.appendChild(topGrid);
-  const transposeWrapper = newElement('DIV', 'transpose-wrapper');
-  topGrid.appendChild(transposeWrapper);
-  transposeWrapper.innerHTML = `<div>Transponér</div>`;
-  const transposeButtonUp = newElement('BUTTON');
-  const transposeButtonDown = newElement('BUTTON');
-  transposeButtonUp.innerHTML = `<i class="fas fa-angle-up"></i>`;
-  transposeButtonDown.innerHTML = `<i class="fas fa-angle-down"></i>`;
-  transposeWrapper.appendChild(transposeButtonUp);
-  transposeWrapper.appendChild(transposeButtonDown);
+  const boxInputWrapper = newElement('DIV', 'box');
+  boxInputWrapper.innerHTML += `<h2 class="box-label">${lang.boxes.input.label}</h2>`;
+  const boxInputContent = newElement('DIV', 'box-content');
+  const form = newElement('FORM');
+  form.onsubmit = (e) => {
+    e.preventDefault();
+  };
+  boxInputContent.appendChild(form);
+  boxInputWrapper.appendChild(boxInputContent);
 
-  const fileDownloadWrapper = newElement('DIV', 'file-settings-wrapper');
-  topGrid.appendChild(fileDownloadWrapper);
-  fileDownloadWrapper.innerHTML = `<div>Filnavn</div>`;
-  const fileNameInput = newElement('INPUT');
-  fileDownloadWrapper.appendChild(fileNameInput);
-  const fileDownloadButton = newElement('BUTTON');
-  fileDownloadWrapper.appendChild(fileDownloadButton);
-  fileDownloadButton.innerHTML = 'Last ned fil';
+  const boxResultWrapper = newElement('DIV', 'box');
+  const boxResultLabel = newElement('DIV', 'box-label');
+  boxResultWrapper.appendChild(boxResultLabel);
+  boxResultLabel.innerHTML = lang.boxes.result.label;
+  const boxResultContent = newElement('DIV', 'box-content');
+  const target = newElement('DIV');
+  boxResultContent.appendChild(target);
+  boxResultWrapper.appendChild(boxResultContent);
+
+  /* Helper styles */
+  const styleSheetSwitch = generateHelperStyleSheetSwitch();
+  boxResultLabel.appendChild(styleSheetSwitch.show);
+  boxResultLabel.appendChild(styleSheetSwitch.hide);
+
+  containerGrid.appendChild(boxInputWrapper);
+  containerGrid.appendChild(boxResultWrapper);
+  section.appendChild(containerGrid);
+
+  /* Form */
+  let generatedTemplate = '';
+
+  /* Metadata input grid */
+  const metadataInputWrapper = newElement('DIV', 'metadata-input-grid');
+  form.appendChild(metadataInputWrapper);
+
+  const metaDataInputTemplate = {
+    name: '...',
+    placeholder: '',
+    labelText: '...',
+    cpKey: '',
+    required: false,
+    isShort: false,
+    isMultiline: false,
+    validation: null,
+    fullWidth: false,
+  };
+
+  const metaDataInputs = [
+    {
+      name: 'title',
+      placeholder: '',
+      labelText: 'Tittel',
+      cpKey: '',
+      required: true,
+      isShort: false,
+      isMultiline: false,
+      validation: NOT_EMPTY,
+      fullWidth: false,
+    },
+    {
+      name: 'artist',
+      placeholder: '',
+      labelText: 'Artist',
+      cpKey: '',
+      required: true,
+      requireTitle: true,
+      isShort: false,
+      validation: NOT_EMPTY,
+      fullWidth: false,
+    },
+    {
+      name: 'album',
+      placeholder: '',
+      labelText: 'Album',
+      cpKey: 'album',
+      required: true,
+      isShort: false,
+      isMultiline: false,
+      validation: null,
+      fullWidth: false,
+    },
+    {
+      name: 'published',
+      placeholder: '',
+      labelText: 'Utgivelsesår',
+      cpKey: 'Published',
+      required: true,
+      isShort: true,
+      isMultiline: false,
+      validation: NOT_EMPTY,
+      fullWidth: false,
+    },
+    {
+      name: 'copyright',
+      placeholder: '',
+      labelText: 'Copyright',
+      cpKey: 'Copyright',
+      required: true,
+      isShort: false,
+      isMultiline: false,
+      validation: null,
+      fullWidth: false,
+    },
+    {
+      name: 'key',
+      placeholder: '',
+      labelText: 'Toneart',
+      cpKey: 'Key',
+      required: true,
+      isShort: true,
+      isMultiline: false,
+      validation: KEY_VALIDATION,
+      fullWidth: false,
+    },
+    {
+      name: 'tempo',
+      placeholder: '',
+      labelText: 'Tempo</br>(BPM)',
+      cpKey: 'Tempo',
+      required: false,
+      isShort: true,
+      isMultiline: false,
+      validation: null,
+      fullWidth: false,
+    },
+    {
+      name: 'time',
+      placeholder: '',
+      labelText: 'Taktart',
+      cpKey: 'Time',
+      required: false,
+      isShort: true,
+      isMultiline: false,
+      validation: null,
+      fullWidth: false,
+    },
+
+    {
+      name: 'textmed',
+      placeholder: '',
+      labelText: 'Tekst</br>/melodi',
+      cpKey: 'T/m', // sjekk dette
+      required: false,
+      isShort: false,
+      isMultiline: false,
+      validation: null,
+      fullWidth: false,
+    },
+    {
+      name: 'web',
+      placeholder: '',
+      labelText: 'Nettside',
+      cpKey: 'Web',
+      required: false,
+      isShort: false,
+      isMultiline: false,
+      validation: null,
+      fullWidth: false,
+    },
+    {
+      name: 'other',
+      placeholder: '',
+      labelText: 'Annet',
+      cpKey: '',
+      required: false,
+      isShort: false,
+      isMultiline: true,
+      validation: null,
+      fullWidth: false,
+    },
+    {
+      name: 'song',
+      placeholder: '',
+      labelText: 'Sang',
+      cpKey: '',
+      required: true,
+      isShort: false,
+      isMultiline: true,
+      validation: NOT_EMPTY,
+      fullWidth: true,
+    },
+  ];
+
+  const songInitialHeight = 20; // rows
+  let filename = 'Blekke untitled';
+
+  /* UpdateTemplate on input */
+  const updateTemplate = () => {
+    generatedTemplate = '';
+    metaDataInputs.forEach((e) => {
+      if (e.isMultiline) {
+        let occurences = (e.input.value.match(/\n/g) ?? []).length + 2;
+        if (e.name === 'song') {
+          occurences = Math.max(songInitialHeight, occurences);
+        }
+        e.input.rows = occurences;
+      }
+      if (e.input?.value) {
+        const evtKey = e.cpKey ? e.cpKey + ': ' : '';
+        const evtLine = e.name === 'song' ? '\n' : '';
+        generatedTemplate += evtKey + evtLine + e.input.value + '\n';
+      }
+    });
+  };
+
+  const everythingIsFilledOut = () => {
+    let res = true;
+    for (let i = 0; i < metaDataInputs.length; i++) {
+      let data = metaDataInputs[i];
+      if (data.required && data.input.value.trim() === '') {
+        data.input.classList.add('error');
+        res = false;
+      }
+    }
+    return res;
+  };
+
+  let song;
+
+  const rerenderTarget = () => {
+    song = new SongEdit(sheetToCp(generatedTemplate));
+    filename = song.generateFileName();
+    song.parseHTMLTable(target);
+  };
+
+  /* Fire change on input */
+  const fireInputChange = () => {
+    updateTemplate();
+    rerenderTarget();
+  };
+
+  /* Metadata inputs */
+  metaDataInputs.forEach((e) => {
+    const label = newElement('LABEL', e.fullWidth ? 'full-width' : '');
+    label.setAttribute('for', e.name);
+    label.innerHTML = e.labelText + (e.required ? '*' : '');
+
+    const input = newElement('TEXTAREA');
+    input.id = e.name;
+    input.style.display = 'none';
+    //input.rows = e.name === 'song' ? songInitialHeight : 1;
+
+    /* New attempt */
+    const inputWrapper = newElement(
+      'DIV',
+      'input-wrapper',
+      e.fullWidth ? 'full-width' : '',
+      e.isShort ? 'short' : ''
+    );
+    inputWrapper.appendChild(input);
+    const span = newElement(
+      'DIV',
+      'textarea-span',
+      e.isMultiline ? 'multiline' : ''
+    );
+    const updateInputFromSpan = (clear) => {
+      input.value = clear ? '' : span.innerText.trim();
+    };
+    span.role = 'textbox';
+    span.innerHTML = '';
+    span.oninput = updateInputFromSpan;
+    span.setAttribute('contenteditable', true);
+    inputWrapper.appendChild(span);
+
+    /* Add input element to metadatalist for iterating through when updating template */
+    e['input'] = input;
+    e['span'] = span;
+    /* Add onclick event for updating template when input */
+
+    switch (e.validation) {
+      case KEY_VALIDATION:
+        span.oninput = () => {
+          adjustKey(span);
+          updateInputFromSpan(true);
+          if (all_keys.indexOf(span.innerText) !== -1) {
+            span.classList.remove('error');
+            if (
+              !metaDataInputs[0].input.value.trim() ||
+              !metaDataInputs[1].input.value.trim()
+            ) {
+              span.classList.add('error');
+              span.innerText = lang.errors.noTitleOrArtistError;
+            } else {
+              updateInputFromSpan();
+            }
+          } else {
+            if (
+              !metaDataInputs[0].input.value.trim() ||
+              !metaDataInputs[1].input.value.trim()
+            ) {
+              updateInputFromSpan(true);
+              span.innerText = lang.errors.noTitleOrArtistError;
+            }
+            span.classList.add('error');
+          }
+          fireInputChange();
+        };
+        break;
+      case NOT_EMPTY:
+        span.oninput = () => {
+          updateInputFromSpan(true);
+          if (span.innerText.trim() !== '') {
+            span.classList.remove('error');
+            updateInputFromSpan();
+          } else {
+            span.classList.add('error');
+          }
+          if (e.requireTitle && !metaDataInputs[0].input.value.trim()) {
+            span.classList.add('error');
+            span.innerText = lang.errors.noTitleBeforeArtistError;
+          }
+          fireInputChange();
+        };
+        break;
+      default:
+        span.oninput = () => {
+          updateInputFromSpan();
+          fireInputChange();
+        };
+        break;
+    }
+
+    metadataInputWrapper.appendChild(label);
+    metadataInputWrapper.appendChild(inputWrapper);
+  });
+
+  const fileDownloadButton = newElement('BUTTON', 'full-width');
+  metadataInputWrapper.appendChild(fileDownloadButton);
+  fileDownloadButton.innerHTML = `${lang.downloadButton}`;
   fileDownloadButton.autocomplete = 'off';
   fileDownloadButton.autocorrect = 'off';
   fileDownloadButton.autocapitalize = 'off';
   fileDownloadButton.spellcheck = 'false';
+  fileDownloadButton.onclick = () => {
+    if (everythingIsFilledOut())
+      saveTextAsFile(sheetToCp(generatedTemplate), filename);
+  };
 
-  const sectionVisWrappWrapp = newElement('DIV', 'vis-wrapper');
-  sectionVisWrappWrapp.innerHTML = '<div>Visningsvalg</div>';
-  const sectionVisibilityWrapper = newElement('DIV', 'visability-wrapper');
-  sectionVisWrappWrapp.appendChild(sectionVisibilityWrapper);
-  topGrid.appendChild(sectionVisWrappWrapp);
-  const chordProBoxButton = newElement('BUTTON', 'section-button');
-  const sheetBoxButton = newElement('BUTTON', 'section-button');
-  const resultBoxButton = newElement('BUTTON', 'section-button');
-  chordProBoxButton.innerHTML = 'ChordPro';
-  sheetBoxButton.innerHTML = 'Over tekst';
-  resultBoxButton.innerHTML = 'Forhåndsvisning';
-  sectionVisibilityWrapper.appendChild(chordProBoxButton);
-  sectionVisibilityWrapper.appendChild(sheetBoxButton);
-  sectionVisibilityWrapper.appendChild(resultBoxButton);
+  const saveUserData = () => {
+    metaDataInputs.forEach((e, i) => {
+      if (!userContent[i] === undefined) userContent.push('');
+      userContent[i] = e.span.innerText;
+    });
+  };
+
+  const applyExampleInput = () => {
+    saveUserData();
+    metaDataInputs.forEach((e, i) => {
+      if (exampleObject[i]) {
+        e.input.value = exampleObject[i];
+        e.span.innerText = e.input.value;
+      }
+    });
+    fireInputChange();
+  };
+
+  const backToUserData = () => {
+    userContent.forEach((content, i) => {
+      let e = metaDataInputs[i];
+      if (e) {
+        console.log(content);
+        e.input.value = content;
+        e.span.innerText = e.input.value;
+      }
+    });
+    console.log('back');
+    fireInputChange();
+  };
+  const rerenderAfterTranspose = () => {
+    song.reRender();
+  };
+  const setValueToLabelAndInputIndex = (index, text) => {
+    const obj = metaDataInputs[index];
+    obj.span.innerText = text;
+    obj.input.value = text;
+  };
+  const setLabelsAndInputsFromSongObj = () => {
+    if (song.metadata.key)
+      setValueToLabelAndInputIndex(5, song.logicWrapper.getTransposedKey());
+    if (song.sections.length) {
+      setValueToLabelAndInputIndex(
+        11,
+        song.parseTransposedChordProOnlyChords()
+      );
+    }
+  };
+  const transposeUp = () => {
+    if (song) {
+      song.transposeUp();
+      rerenderAfterTranspose();
+      setLabelsAndInputsFromSongObj();
+    }
+  };
+  const transposeDown = () => {
+    if (song) {
+      song.transposeDown();
+      rerenderAfterTranspose();
+      setLabelsAndInputsFromSongObj();
+    }
+  };
+  /*   applyExampleInput();
+  fireInputChange();
+  saveUserData();
+  backToUserData();
+  fireInputChange(); */
 
   return {
-    wrapper: panelWrapper,
-    transposeUp: transposeButtonUp,
-    transposeDown: transposeButtonDown,
-    fileNameInput: fileNameInput,
-    downloadButton: fileDownloadButton,
-    visibility: {
-      chordpro: { DOMElement: chordProBoxButton, visible: true },
-      sheet: { DOMElement: sheetBoxButton, visible: true },
-      result: { DOMElement: resultBoxButton, visible: true },
+    DOMSection: section,
+    template: generatedTemplate,
+    exampleHandling: {
+      applyExample: applyExampleInput,
+      revertToUserData: backToUserData,
+    },
+    transpose: {
+      up: transposeUp,
+      down: transposeDown,
     },
   };
 };
 
-const genLayout = (target) => {
-  const appWrapper = newElement('DIV', 'main-wrapper');
+const generateLayout = (target) => {
+  /* Main wrapper */
+  const appWrapper = newElement('DIV', 'app-wrapper');
 
+  const formObject = generateChordProSectionObject();
+  /* Header */
+  const headerWrapper = newElement('HEADER');
   const backgroundOverlay = newElement('DIV', 'background-overlay');
-  appWrapper.appendChild(backgroundOverlay);
-
-  const header = newElement('HEADER');
-  const titleH1 = `<h1>Lag blekke til Lovsang.no</h1>`;
-  header.innerHTML += titleH1;
-
-  appWrapper.appendChild(header);
-
-  const form = newElement('FORM', '');
-  form.name = 'form';
-  form.onsubmit = (e) => {
-    e.preventDefault();
+  headerWrapper.appendChild(backgroundOverlay);
+  const container = newElement('DIV', 'container');
+  headerWrapper.appendChild(container);
+  container.innerHTML += `<h1 class="title">${lang.description.title}</h1>`;
+  container.innerHTML += `<div class="subtitle">${lang.description.subtitle}</div>`;
+  const howTo = newElement('DIV', 'how-to');
+  container.appendChild(howTo);
+  howTo.innerHTML += `<h2>${lang.howTo.title}</h2>`;
+  howTo.innerHTML += `<ol>${lang.howTo.list
+    .map((li) => `<li>${li}</li>`)
+    .join('\n')}</ol>`;
+  howTo.innerHTML += `<p>${lang.howTo.contactUsIfNeeded}</p>`;
+  const howToButtonsWrapper = newElement('DIV', 'how-to-buttons-wrapper');
+  const transposeWrapper = newElement('DIV', 'transpose-wrapper');
+  howToButtonsWrapper.appendChild(transposeWrapper);
+  transposeWrapper.innerHTML = `<div>Transponér</div>`;
+  const transposeButtonUp = newElement('BUTTON', 'transpose-button');
+  const transposeButtonDown = newElement('BUTTON', 'transpose-button');
+  transposeButtonUp.onclick = formObject.transpose.up;
+  transposeButtonDown.onclick = formObject.transpose.down;
+  transposeButtonUp.innerHTML = `<i class="fas fa-angle-up"></i>`;
+  transposeButtonDown.innerHTML = `<i class="fas fa-angle-down"></i>`;
+  transposeWrapper.appendChild(transposeButtonUp);
+  transposeWrapper.appendChild(transposeButtonDown);
+  howTo.appendChild(howToButtonsWrapper);
+  const videoButton = newElement('A', 'button', 'how-to-button');
+  const exampleShow = newElement('A', 'button', 'how-to-button');
+  const exampleHide = newElement('A', 'button', 'how-to-button');
+  howToButtonsWrapper.appendChild(videoButton);
+  howToButtonsWrapper.appendChild(exampleShow);
+  howToButtonsWrapper.appendChild(exampleHide);
+  videoButton.innerHTML = lang.howTo.showVideoButton;
+  exampleShow.innerHTML = lang.howTo.example.show;
+  exampleHide.innerHTML = lang.howTo.example.hide;
+  exampleHide.classList.add('hide');
+  videoButton.onclick = () => {
+    console.log('vis video');
   };
-
-  const boxesWrapper = newElement('DIV', 'boxes-grid');
-  const inputBoxes = genInputBoxes('h100', 'w100');
-  inputBoxes.forEach((boxObj) => {
-    boxesWrapper.appendChild(boxObj.DOMElement);
-  });
-  const resultBoxObj = genResultBox();
-  boxesWrapper.appendChild(resultBoxObj.DOMelement);
-
-  const panel = genPanel(header);
-  form.appendChild(panel.wrapper);
-  form.appendChild(boxesWrapper);
-  appWrapper.appendChild(form);
-
-  const chordproInput = inputBoxes[0].textarea;
-  const sheetInput = inputBoxes[1].textarea;
-  const resultDiv = resultBoxObj.resultDiv;
-
-  const showExampleButton = newElement('A', 'example-link');
-  const hideExampleButton = newElement('A', 'example-link');
-  showExampleButton.innerHTML = 'Vis meg et eksempel';
-  hideExampleButton.innerHTML = 'Gå tilbake';
-  hideExampleButton.style.display = 'none';
-
-  showExampleButton.onclick = (e) => {
-    showExampleButton.style.display = 'none';
-    hideExampleButton.style.display = 'inline-block';
-    exampleHoldUserContent.cp = chordproInput.value;
-    chordproInput.value = exampleContent;
-    cpInputChanged();
+  exampleShow.onclick = () => {
+    exampleShow.classList.add('hide');
+    exampleHide.classList.remove('hide');
+    formObject.exampleHandling.applyExample();
   };
-
-  hideExampleButton.onclick = (e) => {
-    hideExampleButton.style.display = 'none';
-    showExampleButton.style.display = 'inline-block';
-    chordproInput.value = exampleHoldUserContent.cp;
-    cpInputChanged();
+  exampleHide.onclick = () => {
+    exampleHide.classList.add('hide');
+    exampleShow.classList.remove('hide');
+    formObject.exampleHandling.revertToUserData();
   };
+  appWrapper.appendChild(headerWrapper);
 
-  const cpInputChanged = () => {
-    const template = chordproInput.value;
-    sheetInput.value = cpToSheet(template).result;
-    song.reInitialize(template);
-    panel.fileNameInput.value = song.generateFileName();
-  };
-  header.appendChild(showExampleButton);
-  header.appendChild(hideExampleButton);
+  /* Form for generating sheet */
+  const main = newElement('MAIN');
+  main.appendChild(formObject.DOMSection);
+  appWrapper.appendChild(main);
 
-  const song = new SongEdit();
-  song.parseHTMLTable(resultDiv);
-
-  /* Event handlers START */
-  sheetInput.oninput = (e) => {
-    chordproInput.value = sheetToCp(e.target.value);
-    song.reInitialize(chordproInput.value);
-    panel.fileNameInput.value = song.generateFileName();
-  };
-
-  chordproInput.oninput = (e) => {
-    cpInputChanged();
-  };
-
-  panel.downloadButton.onclick = () => {
-    if (chordproInput.value.trim() !== '')
-      saveTextAsFile(chordproInput.value, panel.fileNameInput.value);
-  };
-  /* Event handlers END */
-
-  /* Append to #target */
+  /* Append app to target */
   target.innerHTML = '';
   target.appendChild(appWrapper);
 
-  const transposeAllUp = () => {
-    song.transposeUp();
-    handleTransposeAll();
-  };
-  const transposeAllDown = () => {
-    song.transposeDown();
-    handleTransposeAll();
-  };
-  const handleTransposeAll = () => {
-    chordproInput.value = song.parseTransposedChordPro();
-    sheetInput.value = song.parsePlainText();
-    song.reInitialize(chordproInput.value);
-    panel.fileNameInput.value = song.generateFileName();
-  };
-  panel.transposeUp.onclick = transposeAllUp;
-  panel.transposeDown.onclick = transposeAllDown;
-
-  const updateVisibility = () => {
-    const chordproBtn = panel.visibility.chordpro;
-    const sheetBtn = panel.visibility.sheet;
-    const resultBtn = panel.visibility.result;
-    let countVisible = 0;
-    if (chordproBtn.visible) {
-      chordproBtn.DOMElement.classList.remove('not-active');
-      inputBoxes[0].DOMElement.style.display = 'block';
-      countVisible++;
-    } else {
-      console.log(inputBoxes[0]);
-      chordproBtn.DOMElement.classList.add('not-active');
-      inputBoxes[0].DOMElement.style.display = 'none';
-    }
-    if (sheetBtn.visible) {
-      sheetBtn.DOMElement.classList.remove('not-active');
-      inputBoxes[1].DOMElement.style.display = 'block';
-      countVisible++;
-    } else {
-      sheetBtn.DOMElement.classList.add('not-active');
-      inputBoxes[1].DOMElement.style.display = 'none';
-    }
-    if (resultBtn.visible) {
-      resultBtn.DOMElement.classList.remove('not-active');
-      resultBoxObj.DOMelement.style.display = 'block';
-      countVisible++;
-    } else {
-      resultBtn.DOMElement.classList.add('not-active');
-      resultBoxObj.DOMelement.style.display = 'none';
-    }
-
-    for (let i = 1; i <= 3; i++) {
-      boxesWrapper.classList.remove('w' + i);
-      if (i === countVisible) boxesWrapper.classList.add('w' + countVisible);
-    }
-  };
-
-  panel.visibility.chordpro.DOMElement.onclick = () => {
-    if (panel.visibility.chordpro.visible)
-      panel.visibility.chordpro.visible = false;
-    else panel.visibility.chordpro.visible = true;
-    updateVisibility();
-  };
-  panel.visibility.sheet.DOMElement.onclick = () => {
-    if (panel.visibility.sheet.visible) panel.visibility.sheet.visible = false;
-    else panel.visibility.sheet.visible = true;
-    updateVisibility();
-  };
-  panel.visibility.result.DOMElement.onclick = () => {
-    if (panel.visibility.result.visible)
-      panel.visibility.result.visible = false;
-    else panel.visibility.result.visible = true;
-    updateVisibility();
-  };
+  /* Add listeners and functionality */
 };
 
 const target = document.querySelector('#target');
-genLayout(target);
+generateLayout(target);

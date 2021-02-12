@@ -1,0 +1,385 @@
+/* font-family: 'Open Sans', sans-serif;
+font-family: 'Roboto Mono', monospace; */
+
+:root {
+  --border-color: var(--c-dark20);
+  --border-width: 1px;
+  --border: var(--border-width) solid var(--border-color);
+  --border-radius: 1em;
+  --font-main: monospace; /* 'Open Sans', sans-serif; */
+  --font-mono: 'Roboto Mono', monospace;
+
+  --font-size-base: 16px;
+
+  --background-color-main: var(--c-dark10);
+
+  --c-text-main: #222222;
+  --c-text-white: var(--background-color-main);
+
+  --c-dark00: #ffffff;
+  --c-dark10: #fdfdfd;
+  --c-dark20: #dddddd;
+  --c-dark30: #aaaaaa;
+  --c-dark50: #888888;
+  --c-dark70: #555555;
+  --c-dark80: #333333;
+  --c-dark90: #222222;
+
+  --c-main-accent: #f29559;
+}
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-main);
+  font-size: var(--font-size-base);
+  color: var(--c-text-main);
+  background-color: var(--background-color-main);
+}
+
+body > * {
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+header > a {
+  font-size: 2em;
+  margin-top: 0.4em;
+  font-weight: 200;
+  cursor: pointer;
+  display: inline-block;
+}
+
+footer {
+  margin-top: auto;
+}
+
+.main-wrapper {
+  padding: 2em;
+  height: 100%;
+  display: grid;
+  gap: 2em;
+  grid-template-rows: auto 1fr auto;
+  position: relative;
+}
+
+.background-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.background-overlay:before {
+  content: '';
+  position: absolute;
+  top: -10vh;
+  left: -20vw;
+  width: 200vw;
+  height: 70vh;
+  transform: rotateZ(-2deg);
+  z-index: -1;
+  background-color: var(--c-main-accent);
+  box-shadow: 1px 1px 20px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  margin: 0;
+  font-family: var(--font-main);
+  font-size: 4em;
+  text-indent: -0.06em;
+}
+
+a,
+a:hover,
+a:active,
+a:visited {
+  color: inherit;
+}
+
+.github-icon {
+  position: fixed;
+  top: 0.5em;
+  right: 0.5em;
+  font-size: 3em;
+  line-height: 0;
+  color: var(--c-dark70);
+}
+
+.github-icon:hover {
+  color: var(--c-dark50);
+}
+
+.boxes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 1fr;
+  gap: 2em;
+  margin-bottom: 5vh;
+}
+.boxes-grid.w3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+.boxes-grid.w2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+.boxes-grid.w1 {
+  grid-template-columns: repeat(1, 1fr);
+}
+
+.box {
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  background-color: var(--c-dark00);
+  box-shadow: 2px 2px 30px rgba(0, 0, 0, 0.1);
+  display: grid;
+  align-self: stretch;
+  grid-template-rows: auto 1fr;
+  position: relative;
+  font-size: var(--font-size-base);
+  min-height: 30em;
+}
+
+.box-label {
+  position: relative;
+  border-bottom: var(--border);
+  text-align: center;
+  padding: 0.5em;
+  font-size: 1em;
+  text-transform: uppercase;
+  color: var(--c-dark30);
+}
+
+.box-label > a {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8em;
+  color: var(--c-text-main);
+  right: 1em;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+label {
+  margin: 0;
+  padding: 0;
+  display: block;
+  align-self: stretch;
+}
+
+.box-content {
+  padding: 1.5em;
+}
+
+.h100 {
+  height: 100%;
+}
+
+.w100 {
+  width: 100%;
+}
+
+textarea {
+  border: none;
+  outline: none;
+  resize: none;
+  height: 200px;
+  font-size: var(--font-size-base);
+  font-family: var(--font-mono);
+  color: var(--c-text-main);
+  background-color: inherit;
+}
+
+.action-wrapper {
+  grid-column: 1 / span 3;
+  display: flex;
+  justify-content: center;
+}
+
+button {
+  border: none;
+  background-color: inherit;
+  font-size: 1em;
+  color: inherit;
+  outline: none;
+  padding: inherit;
+  margin: inherit;
+  transition: transform 200ms ease, opacity 200ms ease;
+}
+
+button:hover {
+  transform: scale(1.02);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+button {
+  background-color: var(--c-dark90);
+  color: var(--c-text-white);
+  padding: 0.5em 1em;
+  margin: 0 1.9em;
+  text-transform: uppercase;
+  font-weight: 500;
+  font-size: 1em;
+  position: relative;
+}
+
+.flex-v {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-grow {
+  flex-grow: 1;
+}
+
+.flex-h {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+.overflow-scroll {
+  overflow: auto;
+}
+
+.cp-error-message {
+  background-color: rgba(253, 253, 253, 0.7);
+  position: absolute;
+  top: 3em;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: grid;
+  place-items: center;
+  font-size: 1em;
+  padding: 10%;
+}
+
+.cp-welcome::before {
+  content: 'Velkommen!\A\A Du starter ved å begynne å skrive i en av boksene eller trykke på "Vis meg et eksempel".\A\A Blekken må starte med\A\A        Tittel \A        Artist \A        Key: C';
+  white-space: pre-wrap;
+}
+
+.cp-key-error::before {
+  content: 'Ugyldig toneart.\A\A';
+  white-space: pre-wrap;
+}
+
+.cp-no-key::before {
+  content: 'Toneart mangler. Angi toneart på tredje linje som f.eks. "Key: C"\A\A';
+  white-space: pre-wrap;
+}
+
+.panel-wrapper {
+  padding: 0.7em 1.5em 1.3em 1.5em;
+  border: 1px solid var(--c-dark20);
+  background-color: var(--c-dark00);
+  margin-bottom: 2em;
+  border-radius: var(--border-radius);
+}
+
+.panel-grid-top {
+  display: grid;
+  grid-template-columns: 6em 1fr auto;
+  column-gap: 2em;
+}
+
+.panel-grid-top > * {
+  align-self: stretch;
+}
+
+.transpose-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr;
+  column-gap: 1em;
+  align-content: stretch;
+  grid-template-rows: min-content;
+}
+
+.transpose-wrapper > div:first-child {
+  grid-column: span 3;
+}
+
+.transpose-wrapper > button {
+  display: block;
+  align-self: stretch;
+  margin: 0;
+}
+
+.file-settings-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 10em;
+  grid-template-rows: auto 1fr;
+  column-gap: 0.6em;
+}
+
+.file-settings-wrapper > div:first-child {
+  grid-column: span 2;
+}
+
+.file-settings-wrapper > input {
+  display: block;
+  outline: none;
+  border: none;
+  border: 1px solid var(--c-text-main);
+  border-radius: 0;
+  margin: 0;
+  padding: 0.4em;
+  font-size: 1em;
+  font-family: var(--font-main);
+  min-width: 5em;
+}
+
+.file-settings-wrapper > button {
+  margin: 0;
+  display: block;
+}
+
+.visability-wrapper {
+  grid-column: span 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1em;
+}
+
+.section-button {
+  background-color: transparent;
+  border: 1px solid var(--c-text-main);
+  border-radius: 0.1em;
+  margin: 0;
+  color: var(--c-text-main);
+}
+
+button.not-active {
+  opacity: 0.5;
+}
+
+.vis-wrapper {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
+}
+
+@media only screen and (max-width: 1130px) {
+  .panel-grid-top > div:nth-child(3) {
+    grid-column: span 2;
+  }
+  .panel-grid-top {
+    display: grid;
+    grid-template-columns: 6em 1fr;
+    row-gap: 1em;
+  }
+}
