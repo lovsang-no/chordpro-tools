@@ -54,9 +54,7 @@ const cpToSheet = (template) => {
   return { result: buffer.join('\n'), key: transposedKey };
 };
 
-const p = (s) => {
-  console.log(s);
-};
+const p = (s) => {};
 /* 
 
 
@@ -91,11 +89,9 @@ const cpToSheet2 = (template) => {
   template.split('\n').forEach((line) => {
     if (isCPOneLiner(line)) {
       let oneLineBuffer = [];
-      console.log(line);
       line.split(' ').forEach((chord) => {
         oneLineBuffer.push(chord.unwrapChord());
       });
-      console.log(oneLineBuffer);
       buffer.push(oneLineBuffer.join(' '));
     } /* If line has chords */ else if (line.trim().match(chordRegex)) {
       let chordLine = '';
@@ -103,7 +99,6 @@ const cpToSheet2 = (template) => {
       let lyricLine = '';
       let lineList = line.split(chordRegex);
 
-      console.log(line);
       lineList.forEach((word, index) => {
         let pair = { chord: null, lyrics: null };
         if (isChord(word) && index % 2 !== 0) {
@@ -115,7 +110,6 @@ const cpToSheet2 = (template) => {
           /* Lyrics */
           lyricLine += word;
         }
-        console.log(chordLine + '\n' + lyricLine + '\n\n');
       });
 
       buffer.push(chordLine);

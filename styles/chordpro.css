@@ -6,12 +6,17 @@ td {
   margin: 0;
 }
 
+table {
+  border-collapse: collapse;
+}
+
 td {
   display: inline-block;
 }
 
-.chord {
-  font-weight: bold;
+.cp-wrapper {
+  font-family: Arial, sans-serif;
+  line-height: 1.25;
 }
 
 .cp-section,
@@ -24,6 +29,10 @@ td {
 }
 
 .cp-chord {
+  font-weight: 900;
+}
+
+.cp-copyright-wrapper {
+  font-size: 0.6em;
   font-weight: bold;
-  color: red;
 }

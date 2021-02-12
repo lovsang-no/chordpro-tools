@@ -22,13 +22,15 @@ const isAcceptedOneLineParts = (word) => {
 const checkAndFixOneLiner = (line) => {
   line = line.trim().replace(/  +/g, ' ');
   /* Supporting |chord, ||, --, .., // (and combinations) */
-  const regex = /(( (\-|\.|\||\/)(C|D|E|F|G|A|B|\d)))|((\-|\.|\||\/){2})/gi;
+  const regex = /(\||\.|\-\/|\\)(A|B|C|D|E|F|G|\d)|(\w|\d)(\||\.|\-\/|\\)|(\||\.|\-\/|\\){2}/gi;
   let fixIndex;
   fixIndex = line.search(regex);
   if (fixIndex !== -1) {
-    while ((line.match(regex) || []).length > 0) {
+    let i = 0;
+    while ((line.match(regex) || []).length > 0 && i < 50) {
       fixIndex = line.search(regex);
       line = line.splice(fixIndex + 1, ' ');
+      i++;
     }
   }
   return line;
