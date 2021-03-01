@@ -485,7 +485,7 @@ const generateChordProSectionObject = () => {
       name: 'album',
       placeholder: 'La stå tom hvis det er en singel',
       labelText: 'Album*',
-      cpKey: 'Album',
+      cpKey: 'album',
       required: false,
       isShort: false,
       isMultiline: false,
@@ -635,6 +635,7 @@ const generateChordProSectionObject = () => {
     song.reInitialize(sheetToCp(generatedTemplate));
     filename = song.generateFileName();
     song.parseHTMLTable(target);
+    target.innerHTML = sheetToCp(generatedTemplate).replaceAll('\n', '</br>'); // REMOVE
   };
 
   /* Fire change on input */

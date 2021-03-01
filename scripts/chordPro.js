@@ -313,7 +313,10 @@ class Song {
                 break;
               case 'EMPTY':
                 meta_section_passed = true;
-                this.newSection();
+                // Don't make empty sections
+                if (template.split('\n')[linenum - 1].trim() != '') {
+                  this.newSection();
+                }
                 break;
               case 'NONE':
                 if (meta_section_passed) {
