@@ -3,7 +3,14 @@ const isChordLine = (line) => {
   let lineWords = line.replace(/\s+/g, ' ').trim().split(' ');
   for (let i = 0; i < lineWords.length; i++) {
     let word = lineWords[i];
-    if (!isChord(word)) {
+    // Pass test if using H. Change later on
+    word = useBinsteadOfH(word);
+    lineWords[i] = word;
+
+    if (
+      !isChord(word) &&
+      !isChord(word.substring(0, Math.min(word.length - 1)))
+    ) {
       if (!isAcceptedOneLineParts(word)) return false;
     }
   }
@@ -20,7 +27,7 @@ const isAcceptedOneLineParts = (word) => {
 };
 
 const checkAndFixOneLiner = (line) => {
-  line = line.trim().replace(/  +/g, ' ');
+  line = line.trim().replace(/\s+/g, ' ');
   /* Supporting |chord, ||, --, .., // (and combinations) */
   const regex = /(\||\.|\-\/|\\)(A|B|C|D|E|F|G|\d)|(\w|\d)(\||\.|\-\/|\\)|(\||\.|\-\/|\\){2}/gi;
   let fixIndex;
@@ -28,6 +35,7 @@ const checkAndFixOneLiner = (line) => {
   if (fixIndex !== -1) {
     let i = 0;
     while ((line.match(regex) || []).length > 0 && i < 50) {
+      console.log('hei');
       fixIndex = line.search(regex);
       line = line.splice(fixIndex + 1, ' ');
       i++;
@@ -64,6 +72,11 @@ const getChordsList = (line) => {
   return chordsList;
 };
 
+const useBinsteadOfH = (word) => {
+  if (word.startsWith('H')) return 'B' + word.split('H')[1];
+  else return word;
+};
+
 const sheetToCp = (template) => {
   const lines = template.split('\n');
   const buffer = [];
@@ -80,8 +93,9 @@ const sheetToCp = (template) => {
         if (isOneLiner(line) || (isChordLine(line) && !lines[linenum + 1])) {
           const oneLineBuffer = [];
           let list = checkAndFixOneLiner(line).split(' ');
+
           list.forEach((element) => {
-            oneLineBuffer.push(element.wrapChord());
+            oneLineBuffer.push(useBinsteadOfH(element).wrapChord());
           });
           line = oneLineBuffer.join(' ');
         } else {
@@ -96,7 +110,7 @@ const sheetToCp = (template) => {
             chords.reverse().forEach((chordObj) => {
               lyricsLine = lyricsLine.splice(
                 chordObj.index,
-                chordObj.chord.wrapChord()
+                useBinsteadOfH(chordObj.chord).wrapChord()
               );
             });
             line = lyricsLine;
