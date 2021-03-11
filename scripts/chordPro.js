@@ -610,6 +610,7 @@ class LogicWrapper {
     this.key = undefined;
     this.currentKey = this.getTransposedKey();
     this.currentKeyIsBKey = this.isBKey(this.currentKey);
+
     this.nashvilleLogic = this.getNasvilleList();
     this.parseSTATE = false;
   }
@@ -640,13 +641,16 @@ class LogicWrapper {
     let key_value = value[logic.all_keys.indexOf(key)] + transp;
     while (key_value < 1) key_value += 12;
     while (key_value > 11) key_value -= 12;
-    return logic.sep_keys[this.currentKeyIsBKey ? 1 : 0][key_value];
+    return logic.sep_keys[this.isBKey() ? 1 : 0][key_value];
   }
 
   transposeChord(chord) {
+    console.log('Key: ' + this.key);
+    console.log('CurrentKey: ' + this.currentKey);
+    console.log('BKey: ' + this.currentKeyIsBKey);
     const trans = this.transpose;
     const notes = this.logic.notes;
-    const use_b = this.currentKeyIsBKey;
+    const use_b = this.isBKey();
     const regex = /([A-Z][b#]?)/g;
     const modulo = (n, m) => {
       return ((n % m) + m) % m;
