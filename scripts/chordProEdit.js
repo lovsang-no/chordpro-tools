@@ -14,9 +14,9 @@ class SongEdit extends Song {
         metaBuffer.push(this.metadata.title.wrapHTML('div', 'cp-song-title'));
       if (this.metadata.artist)
         metaBuffer.push(this.metadata.artist.wrapHTML('div', 'cp-song-artist'));
-      if (this.logicWrapper.currentKey)
+      if (this.logicWrapper.getKey())
         metaBuffer.push(
-          ('Toneart: ' + this.logicWrapper.currentKey).wrapHTML('div')
+          ('Toneart: ' + this.logicWrapper.getKey()).wrapHTML('div')
         );
       if (this.metadata.tempo)
         metaBuffer.push(
@@ -60,7 +60,7 @@ class SongEdit extends Song {
       /* End meta data */
 
       /* Add sections */
-      if (this.logicWrapper?.currentKey) {
+      if (this.logicWrapper?.currentKeyObject) {
         this.sections.forEach((section) => {
           if (
             !(
@@ -94,8 +94,8 @@ class SongEdit extends Song {
       const metaBuffer = [];
       if (this.metadata.title) metaBuffer.push(this.metadata.title);
       if (this.metadata.artist) metaBuffer.push(this.metadata.artist);
-      if (this.logicWrapper.currentKey)
-        metaBuffer.push('Key: ' + this.logicWrapper.currentKey);
+      if (this.logicWrapper.getKey())
+        metaBuffer.push('Key: ' + this.logicWrapper.getKey());
       if (this.metadata.tempo) metaBuffer.push('Tempo: ' + this.metadata.tempo);
       if (this.metadata.time) metaBuffer.push('Time: ' + this.metadata.time);
       for (let [key, value] of this.metadata.extra) {
@@ -105,7 +105,7 @@ class SongEdit extends Song {
       /* End meta data */
 
       /* Add sections */
-      if (this.logicWrapper?.currentKey) {
+      if (this.logicWrapper?.currentKeyObject) {
         this.sections.forEach((section) => {
           mainBuffer.push('');
           if (section.title) mainBuffer.push(section.title);
@@ -144,7 +144,7 @@ class SongEdit extends Song {
     const br = '<br>';
     if (this.intialized && this.metadata.title.length !== 0) {
       /* Add sections */
-      if (this.logicWrapper?.currentKey) {
+      if (this.logicWrapper?.currentKeyObject) {
         this.sections.forEach((section) => {
           if (section.title) mainBuffer.push(section.title);
           section.lines?.forEach((line) => {
@@ -186,8 +186,8 @@ class SongEdit extends Song {
       const metaBuffer = [];
       if (this.metadata.title) metaBuffer.push(this.metadata.title);
       if (this.metadata.artist) metaBuffer.push(this.metadata.artist);
-      if (this.logicWrapper.currentKey)
-        metaBuffer.push('Key: ' + this.logicWrapper.currentKey);
+      if (this.logicWrapper.getKey())
+        metaBuffer.push('Key: ' + this.logicWrapper.getKey());
       if (this.metadata.tempo) metaBuffer.push('Tempo: ' + this.metadata.tempo);
       if (this.metadata.time) metaBuffer.push('Time: ' + this.metadata.time);
       for (let [key, value] of this.metadata.extra) {
@@ -197,7 +197,7 @@ class SongEdit extends Song {
       /* End meta data */
 
       /* Add sections */
-      if (this.logicWrapper?.currentKey) {
+      if (this.logicWrapper?.currentKeyObject) {
         this.sections.forEach((section) => {
           mainBuffer.push('');
           if (section.title) mainBuffer.push(section.title);
@@ -263,7 +263,7 @@ class SongEdit extends Song {
       ' - ' +
       (this.metadata.artist ?? '') +
       ' (' +
-      (this.logicWrapper.currentKey ?? '') +
+      (this.logicWrapper.getKey() ?? '') +
       ')'
     );
   }
