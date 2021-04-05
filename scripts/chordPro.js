@@ -45,10 +45,6 @@ const isCPOneLiner = (line) => {
 };
 
 const all_keys = [
-  'A',
-  'Bb',
-  'B',
-  'Cb',
   'C',
   'C#',
   'Db',
@@ -60,6 +56,26 @@ const all_keys = [
   'Gb',
   'G',
   'Ab',
+  'A',
+  'Bb',
+  'B',
+  'Cb',
+  // Minor
+  'Cm',
+  'C#m',
+  'Dm',
+  'D#m',
+  'Ebm',
+  'Em',
+  'Fm',
+  'F#m',
+  'Gm',
+  'G#m',
+  'Abm',
+  'Am',
+  'A#m',
+  'Bbm',
+  'Bm',
 ];
 
 const all_chords = [
@@ -135,12 +151,12 @@ const spaces = (number, space = ' ') => {
 };
 
 class Song {
-  constructor(template) {
+  constructor(template, bypassMeta = false) {
     this.logicWrapper = new LogicWrapper();
     this.metadata = new MetaData();
     this.sections = [];
     this.parseTargets = new Map();
-    if (template) this.intialize(template);
+    if (template) this.intialize(template, bypassMeta);
   }
 
   transposeUp(by = 1) {
@@ -193,14 +209,15 @@ class Song {
     this.reRender();
   }
 
-  intialize(template) {
+  intialize(template, bypassMeta = false) {
     if (template === true) template = this.sampleTemplate;
     template = template.trim();
     this.intialized = true;
 
     var chordRegex = /\[([^\]]*)\]/;
 
-    let meta_section_passed = false;
+    // Await reading of chords if bypassMeta is false until meta data section is passed
+    let meta_section_passed = bypassMeta;
     template
       .trim()
       .split('\n')
@@ -244,6 +261,7 @@ class Song {
           /* Format meta data in a nice way */
           const metaRegex = /^(key|tempo|time|published|copyright|web|album):\s*(.*)/i;
           if (!meta_section_passed && line.match(metaRegex)) {
+            console.log(bypassMeta);
             const matches = line.match(metaRegex, 'i');
 
             if (matches.length >= 3) {
@@ -258,7 +276,6 @@ class Song {
                 case 'Key':
                 case 'key':
                   if (text.trim() !== '') {
-                    this.metadata.key = text;
                     this.logicWrapper.setKey(text.trim());
                   }
                   break;
@@ -290,8 +307,9 @@ class Song {
             }
           } /* For everything else  */ else {
             let LINETYPE;
-            if (linenum === 0) LINETYPE = 'SONG_TITLE';
-            else if (linenum === 1) LINETYPE = 'SONG_ARTIST';
+            if (!meta_section_passed && linenum === 0) LINETYPE = 'SONG_TITLE';
+            else if (!meta_section_passed && linenum === 1)
+              LINETYPE = 'SONG_ARTIST';
             else if (line.trim().endsWith(':')) LINETYPE = 'SECTION_START';
             else if (line.trim() === '' && !meta_section_passed) {
               LINETYPE = 'META_END';
@@ -389,7 +407,7 @@ class Song {
       /* End meta data */
 
       /* Add sections */
-      if (this.logicWrapper?.currentKey) {
+      if (this.logicWrapper?.currentKeyObject) {
         this.sections.forEach((section) => {
           if (
             !(
@@ -406,6 +424,62 @@ class Song {
     }
     target.innerHTML = mainBuffer.join('\n');
     /* Append to target */
+  }
+  getTransposedChordPro(ignoreMeta = false) {
+    const mainBuffer = [];
+    const br = '<br>';
+    if (this.intialized) {
+      /* Add meta data */
+      if (!ignoreMeta) {
+        const metaBuffer = [];
+        if (this.metadata.title) metaBuffer.push(this.metadata.title);
+        if (this.metadata.artist) metaBuffer.push(this.metadata.artist);
+        if (this.logicWrapper.getKey())
+          metaBuffer.push('Key: ' + this.logicWrapper.getKey());
+        if (this.metadata.tempo)
+          metaBuffer.push('Tempo: ' + this.metadata.tempo);
+        if (this.metadata.time) metaBuffer.push('Time: ' + this.metadata.time);
+        for (let [key, value] of this.metadata.extra) {
+          metaBuffer.push(key + ': ' + value);
+        }
+        mainBuffer.push(metaBuffer.join('\n'));
+        /* End meta data */
+      }
+
+      /* Add sections */
+      if (this.logicWrapper?.currentKeyObject) {
+        this.sections.forEach((section) => {
+          mainBuffer.push('');
+          if (section.title) mainBuffer.push(section.title);
+          section.lines?.forEach((line) => {
+            let lineBuffer = [];
+            switch (line.TYPE) {
+              case 'ONELINE':
+                lineBuffer = [];
+                line.oneLine.forEach((e) => {
+                  if (e instanceof Chord)
+                    lineBuffer.push('[' + e.transposedChord() + ']');
+                  else lineBuffer.push('[' + e + ']');
+                });
+                mainBuffer.push(lineBuffer.join(' '));
+                break;
+              case 'LYRICS':
+                mainBuffer.push(line.lyrics);
+                break;
+              case 'LYRICS_AND_CHORDS':
+                lineBuffer = [];
+                line.pairs.forEach((pair) => {
+                  if (pair.chord)
+                    lineBuffer.push('[' + pair.chord.transposedChord() + ']');
+                  if (pair.lyrics) lineBuffer.push(pair.lyrics);
+                });
+                mainBuffer.push(lineBuffer.join(''));
+            }
+          });
+        });
+      }
+      return mainBuffer.join('\n').trim();
+    }
   }
 }
 
@@ -575,80 +649,140 @@ class Chord {
 
 class LogicWrapper {
   constructor() {
-    this.logic = {
-      all_keys: [
-        'A',
-        'Bb',
-        'B',
-        'Cb',
-        'C',
-        'C#',
-        'Db',
-        'D',
-        'Eb',
-        'E',
-        'F',
-        'F#',
-        'Gb',
-        'G',
-        'Ab',
+    /* Revidert statsbudsjett */
+    this.keysObject = {
+      major: [
+        { key: 'C', index: 0, isBKey: false, listIndex: 0 },
+        { key: 'C#', index: 1, isBKey: false, listIndex: 1, sharps: 7 }, // under tvil
+        { key: 'Db', index: 1, isBKey: true, listIndex: 2, flats: 5 },
+        { key: 'D', index: 2, isBKey: false, listIndex: 3, sharps: 2 },
+        { key: 'Eb', index: 3, isBKey: true, listIndex: 4, flats: 3 },
+        { key: 'E', index: 4, isBKey: false, listIndex: 5, sharps: 4 },
+        { key: 'F', index: 5, isBKey: true, listIndex: 6, flats: 1 },
+        { key: 'F#', index: 6, isBKey: false, listIndex: 7, sharps: 6 },
+        { key: 'Gb', index: 6, isBKey: true, listIndex: 8, flats: 6 },
+        { key: 'G', index: 7, isBKey: false, listIndex: 9, sharps: 1 },
+        { key: 'Ab', index: 8, isBKey: true, listIndex: 10, flats: 4 },
+        { key: 'A', index: 9, isBKey: false, listIndex: 11, sharps: 3 },
+        { key: 'Bb', index: 10, isBKey: true, listIndex: 12, flats: 2 },
+        { key: 'B', index: 11, isBKey: false, listIndex: 13, sharps: 5 },
+        { key: 'Cb', index: 11, isBKey: true, listIndex: 14, flats: 7 }, // under tvil
       ],
-      sep_keys: [
-        ['A', 'Bb', 'B', 'C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab'],
-        ['A', 'Bb', 'Cb', 'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab'],
-      ],
-      sep_keys_C: [
-        ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'],
-        ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'Cb'],
-      ],
-      notes: [
-        ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'],
-        ['A', 'Bb', 'Cb', 'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab'],
+      minor: [
+        { key: 'Cm', index: 0, isBKey: true, listIndex: 0, flats: 3 },
+        { key: 'C#m', index: 1, isBKey: false, listIndex: 1, sharps: 4 },
+        { key: 'Dm', index: 2, isBKey: true, listIndex: 2, sharps: 2 },
+        { key: 'D#m', index: 3, isBKey: false, listIndex: 3, sharps: 6 },
+        { key: 'Ebm', index: 3, isBKey: true, listIndex: 4, flats: 6 },
+        { key: 'Em', index: 4, isBKey: false, listIndex: 5, sharps: 1 },
+        { key: 'Fm', index: 5, isBKey: true, listIndex: 6, flats: 4 },
+        { key: 'F#m', index: 6, isBKey: false, listIndex: 7, sharps: 3 },
+        { key: 'Gm', index: 7, isBKey: true, listIndex: 8, flats: 2 },
+        { key: 'G#m', index: 8, isBKey: false, listIndex: 9, sharps: 5 },
+        { key: 'Abm', index: 8, isBKey: true, listIndex: 10, flats: 7 },
+        { key: 'Am', index: 9, isBKey: false, listIndex: 11 },
+        { key: 'A#m', index: 10, isBKey: false, listIndex: 12, sharps: 7 }, // under tvil
+        { key: 'Bbm', index: 10, isBKey: true, listIndex: 13, flats: 5 },
+        { key: 'Bm', index: 11, isBKey: false, listIndex: 14, sharps: 2 },
       ],
     };
-    this.transpose = 0;
-    this.key = undefined;
-    this.currentKey = this.getTransposedKey();
-    this.currentKeyIsBKey = this.isBKey(this.currentKey);
+    console.log(
+      'a',
+      this.keysObject.minor.map((x) => x.key)
+    );
+    this.akkorder = [
+      ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'],
+      ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'Cb'],
+    ];
 
+    this.keyIsMinor = false;
+    this.keys = undefined;
+    this.transpose = 0;
+    this.setTranspose(0);
+    this.key = undefined;
+    this.originalKeyObject = undefined;
+    this.transposedKeyObject = undefined;
     this.nashvilleLogic = this.getNasvilleList();
     this.parseSTATE = false;
   }
+  // nashville -> transp til C også se i liste
+  /* 
 
-  isBKey = (key = this.key) => {
-    if (key === 'A') return false;
-    else if (key === 'Bb') return true;
-    else if (key === 'B') return false;
-    else if (key === 'Cb') return true;
-    else if (key === 'C') return false;
-    else if (key === 'C#') return false;
-    else if (key === 'Db') return true;
-    else if (key === 'D') return false;
-    else if (key === 'Eb') return true;
-    else if (key === 'E') return false;
-    else if (key === 'F') return true;
-    else if (key === 'F#') return false;
-    else if (key === 'Gb') return true;
-    else if (key === 'G') return false;
-    else if (key === 'Ab') return true;
-  };
+moll
+1. sjekk om moll
+2. bruk annen toneartliste
+*/
+
+  updateTransposedKeyObject() {
+    const originalIndex = this.keys.map((x) => x.key).indexOf(this.key);
+    if (originalIndex === -1) return null;
+    let indexShift = this.transpose + originalIndex;
+    indexShift = this.modifiedModulo(
+      this.transpose + originalIndex,
+      this.keys.length
+    );
+    const transposedKeyObject = this.keys[indexShift];
+    this.currentKeyObject = transposedKeyObject;
+  }
 
   getTransposedKey() {
-    const transp = this.transpose;
-    const key = this.key;
-    const logic = this.logic;
-    const value = [0, 1, 2, 2, 3, 4, 4, 5, 6, 7, 8, 9, 9, 10, 11];
-    let key_value = value[logic.all_keys.indexOf(key)] + transp;
-    while (key_value < 1) key_value += 12;
-    while (key_value > 11) key_value -= 12;
-    return logic.sep_keys[this.isBKey() ? 1 : 0][key_value];
+    this.updateTransposedKeyObject();
+    return this.currentKeyObject.key;
+  }
+
+  modifiedModulo(number, modulo) {
+    number = number % modulo;
+    while (number < 0) number += modulo;
+    return number;
+  }
+
+  getChordShiftLength() {
+    return this.currentKeyObject.index - this.originalKeyObject.index;
   }
 
   transposeChord(chord) {
-    console.log('Key: ' + this.key);
-    console.log('CurrentKey: ' + this.currentKey);
-    console.log('BKey: ' + this.currentKeyIsBKey);
-    const trans = this.transpose;
+    if (!this.transpose) return chord;
+    const regex = /([CDEFGABC][b#]?)/g;
+    const isBKey = this.currentKeyObject.isBKey;
+    return chord.replace(regex, ($1) => {
+      const chordBase = $1;
+      const origChordIndex = this.akkorder[
+        this.originalKeyObject.isBKey ? 1 : 0
+      ].indexOf(chordBase);
+      let newIndex = this.modifiedModulo(
+        origChordIndex + this.getChordShiftLength(),
+        12
+      );
+      /*  console.log('');
+      console.log(origChordIndex, this.getChordShiftLength());
+      console.log('OriginalKey: ', this.originalKeyObject.key);
+      console.log('CurrentKey: ', this.currentKeyObject.key);
+      console.log('IndexShift: ', newIndex);
+      console.log('List: ', this.akkorder[isBKey ? 1 : 0]);
+      console.log('Chord: ', chord, chordBase); */
+      let transposedChord = this.akkorder[isBKey ? 1 : 0][newIndex];
+
+      /* If key is F# or G# */
+      if (this.currentKeyObject.sharps >= 6) {
+        if (transposedChord === 'F') transposedChord = 'E#';
+      }
+
+      /* If key is C# */
+      if (this.currentKeyObject.sharps >= 7) {
+        if (transposedChord === 'C') transposedChord = 'B#';
+      }
+
+      /* If key is Gb or Fb */
+      if (this.currentKeyObject.flats >= 6) {
+        if (transposedChord === (this.keyIsMinor ? 'E' : 'F'))
+          transposedChord = 'Fb';
+      }
+
+      console.log('TransposedChord: ', transposedChord);
+      return transposedChord;
+    });
+
+    /* const trans = this.transpose;
     const notes = this.logic.notes;
     const use_b = this.isBKey();
     const regex = /([A-Z][b#]?)/g;
@@ -663,7 +797,7 @@ class LogicWrapper {
         return notes[use_b ? 1 : 0][index];
       }
       return 'XX';
-    });
+    }); */
   }
 
   nashvilleChord(orig = this.orig) {
@@ -698,15 +832,39 @@ class LogicWrapper {
   }
 
   handleChange() {
-    this.currentKey = this.getTransposedKey();
-    this.currentKeyIsBKey = this.isBKey(this.currentKey);
+    this.updateTransposedKeyObject();
     this.nashvilleLogic = this.getNasvilleList();
   }
 
-  setKey(key) {
-    this.key = key;
-    this.handleChange();
+  getKeyObjectFromKey(key) {
+    console.log(key, this.keys);
+    return this.keys.find((x) => x.key === key);
   }
+
+  setKey(key) {
+    try {
+      this.key = key;
+      this.keyIsMinor = key.endsWith('m');
+      this.keys = this.keyIsMinor
+        ? this.keysObject.minor
+        : this.keysObject.major;
+      this.originalKeyObject = this.getKeyObjectFromKey(key);
+      this.currentKeyObject = this.originalKeyObject;
+      this.handleChange();
+    } catch (e) {}
+  }
+
+  getKey() {
+    return this.currentKeyObject?.key;
+  }
+
+  setTranspose(transpose) {
+    this.transpose = transpose;
+    transpose === 0
+      ? (this.transposedKeyObject = this.currentKeyObject)
+      : this.updateTransposedKeyObject();
+  }
+
   getNasvilleList() {
     const key = this.key;
     if (key === 'C') return ['C', 'D', 'E', 'F', 'G', 'A', 'B'];

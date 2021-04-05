@@ -361,6 +361,7 @@ const generateChordProSectionObject = () => {
   let song = new SongEdit();
 
   const rerenderTarget = () => {
+    console.log(song);
     song.reInitialize(sheetToCp(generatedTemplate));
     filename = song.generateFileName();
     song.parseHTMLTable(target);
@@ -519,6 +520,8 @@ const generateChordProSectionObject = () => {
   };
   const rerenderAfterTranspose = () => {
     song.reRender();
+    if (metaDataInputs[5].span?.innerHTML)
+      metaDataInputs[5].span.innerHTML = song.logicWrapper.getTransposedKey();
   };
   const setValueToLabelAndInputIndex = (index, text) => {
     const obj = metaDataInputs[index];
