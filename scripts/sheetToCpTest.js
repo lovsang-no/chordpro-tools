@@ -1,17 +1,6 @@
-const assertEqualLineByLine = (expected, actual, lineBreak = '\n') => {
-  const actualList = actual.split(lineBreak);
-  if (expected.split(lineBreak).length !== actualList.length) {
-    throw new EvalError(
-      'Test failed in ' +
-        currentFunc +
-        '() - expected equal length, but got unequal amount of lines'
-    );
-  }
 
-  expected.split(lineBreak).forEach((expectedLine, index) => {
-    assertEqual(expectedLine, actualList[index]);
-  });
-};
+
+
 
 /* Tests */
 const testThatNothingChangesWhenConvertingFromCorrectCp = () => {

@@ -27,12 +27,14 @@ const superTrim = (s) => {
 };
 
 // Unit
-const assertEqual = (expected, actual) => {
+const assertEqual = (expected, actual, input = '') => {
   if (actual !== expected)
     throw new EvalError(
       'Test failed in ' +
         currentFunc +
-        '() - expected "\n' +
+        '(' +
+        input +
+        ') - expected "\n' +
         expected +
         '\n", but got "\n' +
         actual +
@@ -40,10 +42,33 @@ const assertEqual = (expected, actual) => {
     );
 };
 
-const testChordTranspose = (chordToTranspose, expectedResult) => {
+const assertEqualLineByLine = (
+  expected,
+  actual,
+  input = '',
+  lineBreak = '\n'
+) => {
+  const actualList = actual.split(lineBreak);
+  if (expected.split(lineBreak).length !== actualList.length) {
+    throw new EvalError(
+      'Test failed in ' +
+        currentFunc +
+        '(' +
+        input +
+        ') - expected equal length, but got unequal amount of lines'
+    );
+  }
+
+  expected.split(lineBreak).forEach((expectedLine, index) => {
+    assertEqual(expectedLine, actualList[index], input);
+  });
+};
+
+const testChordTranspose = (chordToTranspose, expectedResult, input = '') => {
   assertEqual(
     expectedResult,
-    song.logicWrapper.transposeChord(chordToTranspose)
+    song.logicWrapper.transposeChord(chordToTranspose),
+    input
   );
 };
 
@@ -71,7 +96,6 @@ const correctTranspose = {
     A: ['A', 'Bm', 'C#m', 'D', 'E', 'F#m', 'G#dim'],
     B: ['B', 'C#m', 'D#m', 'E', 'F#', 'G#m', 'A#dim'],
     Bb: ['Bb', 'Cm', 'Dm', 'Eb', 'F', 'Gm', 'Adim'],
-    Cb: ['Cb', 'Dbm', 'Ebm', 'E', 'Gb', 'Abm', 'Bbdim'],
   },
   minor: {
     Cm: ['Cm', 'Ddim', 'Eb', 'Fm', 'Gm', 'Ab', 'Bb'],
@@ -84,7 +108,6 @@ const correctTranspose = {
     'F#m': ['F#m', 'G#dim', 'A', 'Bm', 'C#m', 'D', 'E'],
     Gm: ['Gm', 'Adim', 'Bb', 'Cm', 'Dm', 'Eb', 'F'],
     'G#m': ['G#m', 'A#dim', 'B', 'C#m', 'D#m', 'E', 'F#'],
-    Abm: ['Abm', 'Bbdim', 'Cb', 'Dbm', 'Ebm', 'Fb', 'Gb'],
     Am: ['Am', 'Bdim', 'C', 'Dm', 'Em', 'F', 'G'],
     'A#m': ['A#m', 'B#dim', 'C#', 'D#m', 'E#m', 'F#', 'G#'],
     Bbm: ['Bbm', 'Cdim', 'Db', 'Ebm', 'Fm', 'Gb', 'Ab'],
@@ -111,7 +134,11 @@ const testTransposingOfAllChordsInKey = (key, transpose = 0) => {
     );
   }
   chordList.forEach((chord, index) => {
-    testChordTranspose(chord, assertChordList[index]);
+    testChordTranspose(
+      chord,
+      assertChordList[index],
+      chord + ', ' + transpose + ', key: ' + key
+    );
   });
 };
 
@@ -134,6 +161,7 @@ const testAllTransposingsFromC = () => {
   console.warn('Transpose test base C passed.');
   testTransposingOfAllChordsInKey('C', 1);
   for (let i = -11; i < 20; i++) testTransposingOfAllChordsInKey('C', i);
+  for (let i = -11; i < 20; i++) testTransposingOfAllChordsInKey('D', i);
   for (let i = -11; i < 20; i++) testTransposingOfAllChordsInKey('Cm', i);
 };
 
@@ -189,7 +217,66 @@ const testTransposingOfComplexChords = () => {
           transposings: [
             { transpose: 1, correctTransposedChord: 'C#msus4' },
             { transpose: 7, correctTransposedChord: 'F#msus4' },
-            { transpose: 13, correctTransposedChord: 'Bbmsus4' },
+            { transpose: 12, correctTransposedChord: 'Bmsus4' },
+          ],
+        },
+      ],
+    },
+    {
+      key: 'Dm',
+      tests: [
+        {
+          chord: 'Ab/Cb',
+          transposings: [
+            { transpose: 0, correctTransposedChord: 'Ab/Cb' },
+            { transpose: 1, correctTransposedChord: 'A/C' },
+            { transpose: 2, correctTransposedChord: 'A/C' },
+            { transpose: 3, correctTransposedChord: 'A#/C#' },
+            { transpose: 4, correctTransposedChord: 'B/D' },
+          ],
+        },
+        {
+          chord: 'Fb',
+          transposings: [
+            /*             { transpose: 0, correctTransposedChord: 'Fb' },
+             */ { transpose: 1, correctTransposedChord: 'E#' },
+          ],
+        },
+        {
+          chord: 'C#',
+          transposings: [
+            /* { transpose: 0, correctTransposedChord: 'Db' } */ {
+              transpose: -2,
+              correctTransposedChord: 'B',
+            },
+          ],
+        },
+        /* {
+          chord: 'Cb/C#',
+          transposings: [{ transpose: 0, correctTransposedChord: 'Cb/Db' }],
+        }, */
+        {
+          chord: 'A/C#',
+          transposings: [
+            /* { transpose: 0, correctTransposedChord: 'A/Db' } */ {
+              transpose: -2,
+              correctTransposedChord: 'G/B',
+            },
+          ],
+        },
+        {
+          chord: 'A#/C#',
+          transposings: [{ transpose: -1, correctTransposedChord: 'A/C' }],
+        },
+        /*  {
+          chord: 'A/C#',
+          transposings: [{ transpose: 0, correctTransposedChord: 'A/Db' }],
+        }, */
+        {
+          chord: 'Db',
+          transposings: [
+            { transpose: 0, correctTransposedChord: 'Db' },
+            { transpose: -2, correctTransposedChord: 'B' },
           ],
         },
       ],
@@ -201,14 +288,14 @@ const testTransposingOfComplexChords = () => {
           chord: 'DbMsus',
           transposings: [
             { transpose: 7, correctTransposedChord: 'GMsus' },
-            { transpose: 13, correctTransposedChord: 'CMsus' },
+            { transpose: 12, correctTransposedChord: 'CMsus' },
           ],
         },
         {
           chord: 'Db-',
           transposings: [
             { transpose: 7, correctTransposedChord: 'G-' },
-            { transpose: 13, correctTransposedChord: 'C-' },
+            { transpose: 12, correctTransposedChord: 'C-' },
           ],
         },
       ],
@@ -217,13 +304,20 @@ const testTransposingOfComplexChords = () => {
 
   complexChordTests.forEach((complexChordTest) => {
     song.logicWrapper.setKey(complexChordTest.key);
+
     complexChordTest.tests.forEach((test) => {
       test.transposings.forEach((transposing) => {
+        if (transposing.debug) debugger;
         song.logicWrapper.setTranspose(transposing.transpose);
-
+        const logState = transposing.correctTransposedChord === '';
         assertEqual(
           transposing.correctTransposedChord,
-          song.logicWrapper.transposeChord(test.chord)
+          song.logicWrapper.transposeChord(test.chord, logState),
+          test.chord +
+            ', ' +
+            transposing.transpose +
+            ', key: ' +
+            complexChordTest.key
         );
       });
     });
@@ -234,6 +328,7 @@ const testTransposingOfTemplate = () => {
   beforeEach('testTransposingOfTemplate');
   // Test transpose of template
   const templates = [
+    // Test 1:
     {
       originalKey: 'Dm',
       original: `
@@ -244,9 +339,8 @@ Vers:
 [Dm/Bb]Kommer han [A]aldri [Dm]mere i hu
 
 Refreng:
-[F]Å, jeg er frelst og [C]salig [A/C#]fordi
-[Dm]Sønnen har gjort meg [A]virkelig fri 
-[Dm]Fri ifra nøden, [Dm/C]dommen og døden 
+[Dm]Sønnen har gjort meg [A]virkelig fri
+[Dm]Fri ifra nøden, [Dm/C]dommen og døden
 [Dm/Bb]Amen, [A]hallelu[Dm]ja!
 `,
       correctTranspose: [
@@ -260,9 +354,8 @@ Vers:
 [Dm/Bb]Kommer han [A]aldri [Dm]mere i hu
 
 Refreng:
-[F]Å, jeg er frelst og [C]salig [A/C#]fordi
-[Dm]Sønnen har gjort meg [A]virkelig fri 
-[Dm]Fri ifra nøden, [Dm/C]dommen og døden 
+[Dm]Sønnen har gjort meg [A]virkelig fri
+[Dm]Fri ifra nøden, [Dm/C]dommen og døden
 [Dm/Bb]Amen, [A]hallelu[Dm]ja!
 `,
         },
@@ -276,10 +369,60 @@ Vers:
 [Cm/Ab]Kommer han [G]aldri [Cm]mere i hu
 
 Refreng:
-[Eb]Å, jeg er frelst og [Bb]salig [G/A]fordi
-[Cm]Sønnen har gjort meg [G]virkelig fri 
-[Cm]Fri ifra nøden, [Cm/Bb]dommen og døden 
+[Cm]Sønnen har gjort meg [G]virkelig fri
+[Cm]Fri ifra nøden, [Cm/Bb]dommen og døden
 [Cm/Ab]Amen, [G]hallelu[Cm]ja!
+`,
+        },
+      ],
+    },
+    // Test 2 - Diverse akkorder
+    {
+      originalKey: 'Dm',
+      original: `
+Vers:
+[Dsus4/E]Ren og rettferdig, [Gmadd9/D]himmelen verdig
+[Fm/Gb]Er jeg i verdens [Gm/D]Frelser alt [Am/D]nu
+[Dm]Ordet forkynner[Dm/C] at mine synder
+[Dm/Bb]Kommer han [Amaj7]aldri [Eb6]mer[C]a[D]a[E]a[F]a[G]a[A]a[Bb]a[Cb]a[Db]a[Eb]a[Fb]a[Gb]a[Ab]e i hu
+
+Refreng:
+[F]Å, jeg er frelst og [C]salig [A/C#]fordi
+[Dm]Sønnen har gjort meg [A]virkelig fri
+[Dm]Fri ifra nøden, [Dm/C]dommen og døden
+[Dm/Bb]Amen, [Amaj7]hallelu[Dm]ja!
+`,
+      correctTranspose: [
+        {
+          transpose: 0,
+          transposedTemplate: `
+Vers:
+[Dsus4/E]Ren og rettferdig, [Gmadd9/D]himmelen verdig
+[Fm/Gb]Er jeg i verdens [Gm/D]Frelser alt [Am/D]nu
+[Dm]Ordet forkynner[Dm/C] at mine synder
+[Dm/Bb]Kommer han [Amaj7]aldri [Eb6]mer[C]a[D]a[E]a[F]a[G]a[A]a[Bb]a[Cb]a[Db]a[Eb]a[Fb]a[Gb]a[Ab]e i hu
+
+Refreng:
+[F]Å, jeg er frelst og [C]salig [A/C#]fordi
+[Dm]Sønnen har gjort meg [A]virkelig fri
+[Dm]Fri ifra nøden, [Dm/C]dommen og døden
+[Dm/Bb]Amen, [Amaj7]hallelu[Dm]ja!
+`,
+        },
+        {
+          transpose: -2,
+          transposedTemplate: `
+Vers:
+[Csus4/D]Ren og rettferdig, [Fmadd9/C]himmelen verdig
+[Ebm/E]Er jeg i verdens [Fm/C]Frelser alt [Gm/C]nu
+[Cm]Ordet forkynner[Cm/Bb] at mine synder
+[Cm/Ab]Kommer han [Gmaj7]aldri [Db6]mer[Bb]a[C]a[D]a[Eb]a[F]a[G]a[Ab]a[A]a[B]a[Db]a[D]a[E]a[Gb]e i hu
+
+Refreng:
+[Eb]Å, jeg er frelst og [Bb]salig [G/B]fordi
+[Cm]Sønnen har gjort meg [G]virkelig fri
+[Cm]Fri ifra nøden, [Cm/Bb]dommen og døden
+[Cm/Ab]Amen, [Gmaj7]hallelu[Cm]ja!
 `,
         },
       ],
@@ -291,11 +434,45 @@ Refreng:
     testSong.logicWrapper.setKey(template.originalKey);
     template.correctTranspose.forEach((element, index) => {
       testSong.logicWrapper.setTranspose(element.transpose);
-      assertEqual(
+      assertEqualLineByLine(
         element.transposedTemplate.trim(),
-        testSong.getTransposedChordPro(true)
+        testSong.getTransposedChordPro(true),
+        template.original + ', ' + element.transpose
       );
     });
+  });
+};
+
+const transposeOnelinersAndPrint = () => {
+  beforeEach('transposeOnelinersAndPrint');
+  testList = [
+    {
+      key: 'Dm',
+      original: `[Cm/Ab] [Gmaj7] [Db6] [Bb] [C] [D] [Eb] [F] [G] [Ab] [A] [B] [Db] [D] [E] [Gb]`,
+    },
+  ];
+
+  testList.forEach((testElement, index) => {
+    const testSong = new Song(testElement.original, true);
+    testSong.logicWrapper.setKey(testElement.key);
+
+    console.warn('transposeOnelinersAndPrint()');
+    const buffer = [];
+    for (let i = -4; i < 13; i++) {
+      testSong.logicWrapper.setTranspose(i);
+      buffer.push(
+        testSong.logicWrapper.getTransposedKey() +
+          ',' +
+          i +
+          ',' +
+          testSong
+            .getTransposedChordPro(true)
+            .replaceAll('] [', ',')
+            .replace('[', '')
+            .replace(']', '')
+      );
+    }
+    console.log(buffer.join('\n'));
   });
 };
 
@@ -305,6 +482,7 @@ const run = () => {
   testAllTransposingsFromC();
   testTransposingOfComplexChords();
   testTransposingOfTemplate();
+  transposeOnelinersAndPrint();
   console.warn('All tests passed!');
 };
 
