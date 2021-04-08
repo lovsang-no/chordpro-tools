@@ -443,8 +443,8 @@ class Song {
           metaBuffer.push(key + ': ' + value);
         }
         mainBuffer.push(metaBuffer.join('\n'));
-        /* End meta data */
       }
+      /* End meta data */
 
       /* Add sections */
       if (this.logicWrapper?.currentKeyObject) {
