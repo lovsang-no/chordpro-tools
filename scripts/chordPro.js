@@ -92,6 +92,7 @@ const all_chords = [
   'Eb',
   'E',
   'E#',
+  'Fb',
   'F',
   'F#',
   'Gb',
@@ -665,7 +666,6 @@ class LogicWrapper {
         { key: 'A', index: 9, isBKey: false, listIndex: 11, sharps: 3 },
         { key: 'Bb', index: 10, isBKey: true, listIndex: 12, flats: 2 },
         { key: 'B', index: 11, isBKey: false, listIndex: 13, sharps: 5 },
-        { key: 'Cb', index: 11, isBKey: true, listIndex: 14, flats: 7 }, // under tvil
       ],
       minor: [
         { key: 'Cm', index: 0, isBKey: true, listIndex: 0, flats: 3 },
@@ -678,17 +678,15 @@ class LogicWrapper {
         { key: 'F#m', index: 6, isBKey: false, listIndex: 7, sharps: 3 },
         { key: 'Gm', index: 7, isBKey: true, listIndex: 8, flats: 2 },
         { key: 'G#m', index: 8, isBKey: false, listIndex: 9, sharps: 5 },
-        { key: 'Abm', index: 8, isBKey: true, listIndex: 10, flats: 7 },
-        { key: 'Am', index: 9, isBKey: false, listIndex: 11 },
-        { key: 'A#m', index: 10, isBKey: false, listIndex: 12, sharps: 7 }, // under tvil
-        { key: 'Bbm', index: 10, isBKey: true, listIndex: 13, flats: 5 },
-        { key: 'Bm', index: 11, isBKey: false, listIndex: 14, sharps: 2 },
+        { key: 'Am', index: 9, isBKey: false, listIndex: 10 },
+        { key: 'Bbm', index: 10, isBKey: true, listIndex: 11, flats: 5 },
+        { key: 'Bm', index: 11, isBKey: false, listIndex: 12, sharps: 2 },
       ],
     };
 
     this.akkorder = [
       ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'],
-      ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'Cb'],
+      ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'],
     ];
 
     this.keyIsMinor = false;
@@ -697,7 +695,8 @@ class LogicWrapper {
     this.setTranspose(0);
     this.key = undefined;
     this.originalKeyObject = undefined;
-    this.transposedKeyObject = undefined;
+    this.currentKeyObject = undefined;
+    //this.transposedKeyObject = undefined;
     this.nashvilleLogic = this.getNasvilleList();
     this.parseSTATE = false;
   }
@@ -710,7 +709,7 @@ moll
 */
 
   updateTransposedKeyObject() {
-    const originalIndex = this.keys.map((x) => x.key).indexOf(this.key);
+    const originalIndex = this.keys.map((x) => x.key).indexOf(this.key); // TODO: Kan mulig erstattes siden vi allerede har akkorden
     if (originalIndex === -1) return null;
     let indexShift = this.transpose + originalIndex;
     indexShift = this.modifiedModulo(
@@ -736,27 +735,75 @@ moll
     return this.currentKeyObject.index - this.originalKeyObject.index;
   }
 
-  transposeChord(chord) {
+  transposeChord(chord, logRes = false) {
     if (!this.transpose) return chord;
     const regex = /([CDEFGABC][b#]?)/g;
     const isBKey = this.currentKeyObject.isBKey;
+
+    const getExtraShiftLength = (c) => (['Fb'].indexOf(c) === -1 ? 2 : 1);
+    const adjustChord = (c) => (c === 'Fb' ? 'E' : c);
+
     return chord.replace(regex, ($1) => {
-      const chordBase = $1;
-      const origChordIndex = this.akkorder[
+      let chordBase = $1;
+      chordBase = chordBase.replace('Cb', 'B');
+      let findChordInList = this.akkorder[
         this.originalKeyObject.isBKey ? 1 : 0
-      ].indexOf(chordBase);
+      ];
+      let origChordIndex = -1;
+
+      const findChordIndex = (chord) =>
+        (origChordIndex = findChordInList.indexOf(chordBase));
+
+      findChordIndex(chordBase);
+      if (logRes) {
+        console.log('-'.repeat(10));
+        console.log(origChordIndex, this.getChordShiftLength());
+        console.log('OriginalKey: ', this.originalKeyObject.key);
+        console.log('CurrentKey: ', this.currentKeyObject.key);
+        console.log('Orig list: ', findChordInList);
+        console.log('ChordBase: ', chordBase); /**/
+      }
+      if (origChordIndex === -1) {
+        chordBase = adjustChord(chordBase);
+        findChordIndex(chordBase);
+      }
+
+      /* If something wild happends */
+      if (origChordIndex === -1) {
+        /* If isBkey and suddenly wild # appears */
+        if (this.originalKeyObject.isBKey) {
+          chordBase = chordBase.replace('#', 'b');
+          findChordIndex(chordBase);
+          origChordIndex += getExtraShiftLength(chordBase);
+        } else {
+          chordBase = chordBase.replace('b', '#');
+          findChordIndex(chordBase);
+          origChordIndex -= getExtraShiftLength(chordBase);
+        }
+      }
+
       let newIndex = this.modifiedModulo(
         origChordIndex + this.getChordShiftLength(),
-        12
+        this.akkorder[this.originalKeyObject.isBKey ? 1 : 0].length
       );
-      /*  console.log('');
-      console.log(origChordIndex, this.getChordShiftLength());
-      console.log('OriginalKey: ', this.originalKeyObject.key);
-      console.log('CurrentKey: ', this.currentKeyObject.key);
-      console.log('IndexShift: ', newIndex);
-      console.log('List: ', this.akkorder[isBKey ? 1 : 0]);
-      console.log('Chord: ', chord, chordBase); */
-      let transposedChord = this.akkorder[isBKey ? 1 : 0][newIndex];
+
+      if (logRes) {
+        console.log('Etter bearbeiding');
+        console.log('ChordBase: ', chordBase); /**/
+        console.log(origChordIndex, this.getChordShiftLength());
+        console.log('OriginalKey: ', this.originalKeyObject.key);
+        console.log('CurrentKey: ', this.currentKeyObject.key);
+        console.log('IndexShift: ', newIndex);
+        console.log(
+          'Current List: ',
+          this.akkorder[this.currentKeyObject.isBKey ? 1 : 0]
+        );
+      }
+      let transposedChord = this.akkorder[this.currentKeyObject.isBKey ? 1 : 0][
+        newIndex
+      ];
+      if (logRes) console.log('New chord:', transposedChord);
+      if (origChordIndex === -1) transposedChord = 'XX';
 
       /* If key is F# or G# */
       if (this.currentKeyObject.sharps >= 6) {
@@ -772,27 +819,11 @@ moll
       if (this.currentKeyObject.flats >= 6) {
         if (transposedChord === (this.keyIsMinor ? 'E' : 'F'))
           transposedChord = 'Fb';
+        if (transposedChord === 'B') transposedChord = 'Cb';
       }
 
       return transposedChord;
     });
-
-    /* const trans = this.transpose;
-    const notes = this.logic.notes;
-    const use_b = this.isBKey();
-    const regex = /([A-Z][b#]?)/g;
-    const modulo = (n, m) => {
-      return ((n % m) + m) % m;
-    };
-    return chord.replace(regex, ($1) => {
-      let index = notes[0].indexOf($1);
-      if (index == -1) index = notes[1].indexOf($1);
-      if (index != -1) {
-        index = modulo(index + trans, notes[0].length);
-        return notes[use_b ? 1 : 0][index];
-      }
-      return 'XX';
-    }); */
   }
 
   nashvilleChord(orig = this.orig) {
@@ -854,9 +885,8 @@ moll
 
   setTranspose(transpose) {
     this.transpose = transpose;
-    transpose === 0
-      ? (this.transposedKeyObject = this.currentKeyObject)
-      : this.updateTransposedKeyObject();
+    if (transpose) this.updateTransposedKeyObject();
+    else this.currentKeyObject = this.originalKeyObject;
   }
 
   getNasvilleList() {
