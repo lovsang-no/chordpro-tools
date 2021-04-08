@@ -261,7 +261,6 @@ class Song {
           /* Format meta data in a nice way */
           const metaRegex = /^(key|tempo|time|published|copyright|web|album):\s*(.*)/i;
           if (!meta_section_passed && line.match(metaRegex)) {
-            console.log(bypassMeta);
             const matches = line.match(metaRegex, 'i');
 
             if (matches.length >= 3) {
@@ -443,8 +442,8 @@ class Song {
           metaBuffer.push(key + ': ' + value);
         }
         mainBuffer.push(metaBuffer.join('\n'));
-        /* End meta data */
       }
+      /* End meta data */
 
       /* Add sections */
       if (this.logicWrapper?.currentKeyObject) {
@@ -686,10 +685,7 @@ class LogicWrapper {
         { key: 'Bm', index: 11, isBKey: false, listIndex: 14, sharps: 2 },
       ],
     };
-    console.log(
-      'a',
-      this.keysObject.minor.map((x) => x.key)
-    );
+
     this.akkorder = [
       ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'],
       ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'Cb'],
@@ -778,7 +774,6 @@ moll
           transposedChord = 'Fb';
       }
 
-      console.log('TransposedChord: ', transposedChord);
       return transposedChord;
     });
 
@@ -837,7 +832,6 @@ moll
   }
 
   getKeyObjectFromKey(key) {
-    console.log(key, this.keys);
     return this.keys.find((x) => x.key === key);
   }
 

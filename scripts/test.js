@@ -1,7 +1,7 @@
 /* Document for testing transpose logic */
 
 // Variables
-let song = new Song();
+const song = new Song();
 
 // Utils
 let currentFunc;
@@ -35,7 +35,6 @@ const setTranspose = (transpose) => {
   song.logicWrapper.setTranspose(transpose);
 };
 
-// Correct transposing schema
 const correctTranspose = {
   major: {
     C: ['C', 'Dm', 'Em', 'F', 'G', 'Am', 'Bdim'],
@@ -141,7 +140,76 @@ const testAllKeyTransposingFromC = () => {
 const testTransposingOfComplexChords = () => {
   beforeEach('testTransposingOfComplexChords');
 
-  const complexChordTests = [{}];
+  const complexChordTestElementStructure = {
+    key: '',
+    tests: [
+      {
+        chord: '',
+        transposings: [{ transpose: 0, correctTransposedChord: '' }],
+      },
+    ],
+  };
+
+  const complexChordTests = [
+    {
+      key: 'C',
+      tests: [
+        {
+          chord: 'Cmsus4',
+          transposings: [
+            { transpose: 1, correctTransposedChord: 'C#msus4' },
+            { transpose: 7, correctTransposedChord: 'F#msus4' },
+          ],
+        },
+      ],
+    },
+    {
+      key: 'Cm',
+      tests: [
+        {
+          chord: 'Cmsus4',
+          transposings: [
+            { transpose: 1, correctTransposedChord: 'C#msus4' },
+            { transpose: 7, correctTransposedChord: 'F#msus4' },
+            { transpose: 13, correctTransposedChord: 'Bbmsus4' },
+          ],
+        },
+      ],
+    },
+    {
+      key: 'Bbm',
+      tests: [
+        {
+          chord: 'DbMsus',
+          transposings: [
+            { transpose: 7, correctTransposedChord: 'GMsus' },
+            { transpose: 13, correctTransposedChord: 'CMsus' },
+          ],
+        },
+        {
+          chord: 'Db-',
+          transposings: [
+            { transpose: 7, correctTransposedChord: 'G-' },
+            { transpose: 13, correctTransposedChord: 'C-' },
+          ],
+        },
+      ],
+    },
+  ];
+
+  complexChordTests.forEach((complexChordTest) => {
+    song.logicWrapper.setKey(complexChordTest.key);
+    complexChordTest.tests.forEach((test) => {
+      test.transposings.forEach((transposing) => {
+        song.logicWrapper.setTranspose(transposing.transpose);
+
+        assertEqual(
+          transposing.correctTransposedChord,
+          song.logicWrapper.transposeChord(test.chord)
+        );
+      });
+    });
+  });
 };
 
 const testTransposingOfTemplate = () => {
@@ -219,7 +287,7 @@ const run = () => {
   testAllTransposingsFromC();
   testTransposingOfComplexChords();
   testTransposingOfTemplate();
-  console.log('All tests passed!');
+  console.warn('All tests passed!');
 };
 
 run();

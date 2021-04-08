@@ -361,7 +361,6 @@ const generateChordProSectionObject = () => {
   let song = new SongEdit();
 
   const rerenderTarget = () => {
-    console.log(song);
     song.reInitialize(sheetToCp(generatedTemplate));
     filename = song.generateFileName();
     song.parseHTMLTable(target);
