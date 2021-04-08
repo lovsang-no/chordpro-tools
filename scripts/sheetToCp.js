@@ -29,13 +29,12 @@ const isAcceptedOneLineParts = (word) => {
 const checkAndFixOneLiner = (line) => {
   line = line.trim().replace(/\s+/g, ' ');
   /* Supporting |chord, ||, --, .., // (and combinations) */
-  const regex = /(\||\.|\-\/|\\)(A|B|C|D|E|F|G|\d)|(\w|\d)(\||\.|\-\/|\\)|(\||\.|\-\/|\\){2}/gi;
+  const regex = /(\||\.|\-\/|\\)(C|D|E|F|G|A|B|\d)|(\w|\d)(\||\.|\-\/|\\)|(\||\.|\-\/|\\){2}/gi;
   let fixIndex;
   fixIndex = line.search(regex);
   if (fixIndex !== -1) {
     let i = 0;
     while ((line.match(regex) || []).length > 0 && i < 50) {
-      console.log('hei');
       fixIndex = line.search(regex);
       line = line.splice(fixIndex + 1, ' ');
       i++;
@@ -77,11 +76,66 @@ const useBinsteadOfH = (word) => {
   else return word;
 };
 
-const sheetToCp = (template) => {
+const sheetToCp = (template, bypassMeta = false) => {
+  const lines = template.trim().split('\n');
+  const buffer = [];
+  let justMergedWithLyrics = false;
+  let passedMetaSection = bypassMeta;
+  let lastLineWasLineBreak = false;
+
+  lines.forEach((line, linenum) => {
+    if (!(!line.trim() && lastLineWasLineBreak)) {
+      if (!passedMetaSection) {
+        buffer.push(line);
+        if (line.trim() === '') passedMetaSection = true;
+      } else if (!justMergedWithLyrics) {
+        if (line.trim() !== '' && isChordLine(line)) {
+          /* One liner */
+          if (isOneLiner(line) || (isChordLine(line) && !lines[linenum + 1])) {
+            const oneLineBuffer = [];
+            let list = checkAndFixOneLiner(line).split(' ');
+
+            list.forEach((element) => {
+              oneLineBuffer.push(element.wrapChord());
+            });
+            line = oneLineBuffer.join(' ');
+          } else {
+            /* Regular chord over text */
+            const nextLine = lines[linenum + 1] ?? '';
+            if (!isChordLine(nextLine)) {
+              const chords = getChordsList(line);
+              let lyricsLine = nextLine;
+              if (lyricsLine.length < line.length)
+                lyricsLine += spaces(line.length - lyricsLine.length - 1);
+              /* Adding chords backwards */
+              chords.reverse().forEach((chordObj) => {
+                lyricsLine = lyricsLine.splice(
+                  chordObj.index,
+                  chordObj.chord.wrapChord()
+                );
+              });
+              line = lyricsLine;
+              justMergedWithLyrics = true;
+            }
+          }
+        }
+
+        lastLineWasLineBreak = !line.trim();
+        buffer.push(line.trim()); // TODO: Remove trim for more controll for the person making the sheet?
+      } else {
+        justMergedWithLyrics = false;
+      }
+    }
+  });
+
+  return buffer.join('\n');
+};
+
+const sheetToCpols = (template, bypassMeta = false) => {
   const lines = template.split('\n');
   const buffer = [];
   let justMergedWithLyrics = false;
-  let passedMetaSection = false;
+  let passedMetaSection = bypassMeta;
 
   lines.forEach((line, linenum) => {
     if (!passedMetaSection) {
@@ -120,6 +174,7 @@ const sheetToCp = (template) => {
       }
       buffer.push(line);
     } else {
+      console.log(line);
       justMergedWithLyrics = false;
     }
   });
