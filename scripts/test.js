@@ -6,6 +6,26 @@ const song = new Song();
 // Utils
 let currentFunc;
 
+const superTrim = (s) => {
+  const lineList = s.split('\n');
+
+  do {
+    if (lineList[0].trim()) break;
+    lineList.shift();
+  } while (lineList.length);
+
+  const line = lineList[0];
+  const chars = line.split('');
+  let spacesCount = 0;
+
+  for (const char of chars) {
+    if (char.trim()) break;
+    spacesCount++;
+  }
+
+  return lineList.map((e) => e.substring(spacesCount)).join('\n');
+};
+
 // Unit
 const assertEqual = (expected, actual) => {
   if (actual !== expected)
@@ -80,13 +100,11 @@ const testTransposingOfAllChordsInKey = (key, transpose = 0) => {
   setKey(key);
   setTranspose(transpose);
   const transposedKey = song.logicWrapper.getTransposedKey();
-  console.log(transposedKey);
   let assertChordList;
   try {
     assertChordList = minor
       ? correctTranspose.minor[transposedKey]
       : correctTranspose.major[transposedKey];
-    console.log(assertChordList);
   } catch (e) {
     throw new Error(
       'Test fails in testTransposingOfAllChordsInKey() - cant get list for new key'
