@@ -627,6 +627,77 @@ class SongLine {
   }
 }
 
+/**
+ * Suggestion for Chord object for fixing alt.
+ * Equals `Amaj7/C#`
+ */
+const chordObject = {
+  rootNote: 'A',
+  quality: 'maj7',
+  baseNote: {
+    rootNote: 'C#',
+    quality: null,
+    baseNote: null,
+  },
+};
+
+// SIMON
+const initialChordList = [
+  {
+    halfNotesFromC: 0,
+    variants: ['B#', 'C'],
+  },
+];
+
+const getInitialChordObjectFromString = (chordString) => {
+  // Handle potential H
+
+  // Get root note
+  const regex = /([CDEFGABC][b#]?)/g;
+  const rootNoteFromString = chordString.match(regex)[0];
+  const quality = chordString.split(regex);
+
+  if (!rootNoteFromString) console.log('Could not find root note');
+
+  // Find initial chord with matching chord
+  for (const chordObject of initialChordList) {
+    for (const noteVariant of chordObject.variants) {
+      if (noteVariant === rootNoteFromString) {
+        return {
+          initialChordObject: chordObject,
+          originalChord: chordObject,
+          quality: quality,
+        };
+      }
+    }
+  }
+  // Nothing is found
+  return null;
+};
+
+class Cård {
+  constructor(chordString) {
+    this.rootNote = undefined;
+    this.quality = undefined;
+    this.bassNote = undefined;
+
+    this.readChordString(chordString);
+  }
+
+  readChordString(chordString) {
+    const chordParts = chordString.split('/');
+    const rootChordString = chordParts[0];
+    const bassChordString = chordParts[1];
+
+    this.rootNote = getInitialChordObjectFromString(rootChordString);
+    this.bassNote = getInitialChordObjectFromString(bassChordString);
+
+    console.log(this);
+  }
+}
+
+const cård = new Cård('Csus3/B#');
+
 class Chord {
   constructor(chord, logicWrapper) {
     this.logicWrapper = logicWrapper;
