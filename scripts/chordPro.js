@@ -647,6 +647,50 @@ const initialChordList = [
     halfNotesFromC: 0,
     variants: ['B#', 'C'],
   },
+  {
+    halfNotesFromC: 1,
+    variants: ['C#', 'Db'],
+  },
+  {
+    halfNotesFromC: 2,
+    variants: ['D'],
+  },
+  {
+    halfNotesFromC: 3,
+    variants: ['D#', 'Eb'],
+  },
+  {
+    halfNotesFromC: 4,
+    variants: ['E', 'Fb'],
+  },
+  {
+    halfNotesFromC: 5,
+    variants: ['E#', 'F'],
+  },
+  {
+    halfNotesFromC: 6,
+    variants: ['F#', 'Gb'],
+  },
+  {
+    halfNotesFromC: 7,
+    variants: ['G'],
+  },
+  {
+    halfNotesFromC: 8,
+    variants: ['G#', 'Ab'],
+  },
+  {
+    halfNotesFromC: 9,
+    variants: ['A'],
+  },
+  {
+    halfNotesFromC: 10,
+    variants: ['A#', 'Bb'],
+  },
+  {
+    halfNotesFromC: 11,
+    variants: ['B', 'Cb'],
+  }
 ];
 
 const getInitialChordObjectFromString = (chordString) => {
