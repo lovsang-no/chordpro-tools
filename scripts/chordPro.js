@@ -1,5 +1,4 @@
 /* String utils */
-
 String.prototype.splice = function (index, string, remove = 0) {
   /* As suggested in https://stackoverflow.com/questions/4313841/insert-a-string-at-a-specific-index */
   return this.slice(0, index) + string + this.slice(index + Math.abs(remove));
@@ -562,11 +561,15 @@ class SongLine {
     switch (this.TYPE) {
       case 'ONELINE':
         let oneLineBuffer = [];
-        this.oneLine.forEach((chord) => {
+        this.oneLine.forEach((chordObject) => {
+          console.log('hallo', chordObject instanceof Chord);
           let e =
-            chord instanceof Chord
-              ? chord.transposedChord()
-              : chord.wrapHTML('span', 'cp-chord');
+            chordObject instanceof Chord
+              ? chordObjectToTransposedString(chordObject).wrapHTML(
+                  'span',
+                  'cp-chord'
+                )
+              : chordObject.wrapHTML('span', 'cp-chord');
           oneLineBuffer.push(e);
         });
         lineBuffer.push(oneLineBuffer.join(' ').wrapHTML('div'));
@@ -588,9 +591,11 @@ class SongLine {
             let tableBuffer = [];
             for (let i = 0; i < pairs.length; i++) {
               let pair = pairs[i];
-              let chord = pair.chord;
+              let chordObject = pair.chord;
               let lyrics = pair.lyrics;
-              chordLine = chord ? chord.transposedChord() : '';
+              chordLine = chordObject
+                ? chordObject.transposedChord().wrapHTML('span', 'cp-chord')
+                : '';
               lyricsLine = lyrics ? lyrics.replaceAll(' ', '&nbsp') : '&nbsp';
               tableBuffer.push('<td>');
               tableBuffer.push(chordLine + br + lyricsLine);
@@ -659,10 +664,10 @@ class Chord {
     const bassChordString = chordParts[1];
 
     this.root = rootChordString
-      ? getInitialChordObjectFromString(rootChordString)
+      ? chordPartObjectFromString(rootChordString)
       : null;
     this.bass = bassChordString
-      ? getInitialChordObjectFromString(bassChordString)
+      ? chordPartObjectFromString(bassChordString)
       : null;
   }
 
@@ -676,14 +681,16 @@ class Chord {
 }
 
 class LogicWrapper {
-  constructor(transposeStep = 0) {
-    this.transposeStep = transposeStep;
+  constructor(key) {
+    this.transposeStep = 0;
     this.keyIsMinor = undefined;
     this.key = undefined;
     this.keys = undefined;
     this.setTranspose(this.transposeStep);
     this.originalKeyObject = undefined;
     this.currentKeyObject = undefined;
+
+    if (key) this.setKey(key);
   }
 
   transposeUp(by = 1) {
@@ -747,6 +754,8 @@ class LogicWrapper {
     return this.currentKeyObject?.key;
   }
 }
+
+chordObjectToSolfegeString(new Chord('C', new LogicWrapper('C')));
 
 const templateTest = `Jeg vil følge
 Impuls
