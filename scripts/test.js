@@ -405,3 +405,5 @@ const run = () => {
 };
 
 run();
+
+const song2 = new SongEdit(templateTest);

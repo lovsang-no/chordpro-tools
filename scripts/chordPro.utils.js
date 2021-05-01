@@ -1,7 +1,6 @@
 /**
  * Modified modulo for using with negative numbers.
  *
- *
  * @param {number} number
  * @param {number} modulo
  * @returns {number} modulo result
@@ -309,10 +308,12 @@ const chordObjectTemplate = {
   bass: null,
 };
 
+/* F R O M   S T R I N G   S T A R T */
+
 /**
  * Method for get a chord object from a chord string.
  *
- * @param {*} chordString
+ * @param {string} chordString
  * @returns
  */
 const chordPartObjectFromString = (chordString) => {
@@ -323,7 +324,8 @@ const chordPartObjectFromString = (chordString) => {
     chordString = 'B' + chordString.substr(1, chordString.length);
 
   /* If chord is invalid */
-  if (!chordString.match(regex)) return null;
+  if (!chordString.match(regex))
+    throw new EvalError('Chord string does not match regex.');
 
   const rootNoteFromString = chordString.match(regex)[0];
   const quality = chordString.split(regex)[2];
@@ -343,8 +345,44 @@ const chordPartObjectFromString = (chordString) => {
   }
 
   /* If nothing is found */
+  throw new Error('No chord is found. Rare case. Try again.');
   return null;
 };
+
+/**
+ * Method for generating a chord object from a chord string.
+ *
+ * @param {string} chordString
+ * @param {object} transposeLogic
+ * @throws EvalError if chord string does not match regex
+ * @returns
+ */
+const genereateChordObjectFromString = (chordString, transposeLogic) => {
+  const chordParts = chordString.split('/');
+  const rootChordString = chordParts[0];
+  const bassChordString = chordParts[1];
+
+  const root = rootChordString
+    ? chordPartObjectFromString(rootChordString)
+    : null;
+  const bass = bassChordString
+    ? chordPartObjectFromString(bassChordString)
+    : null;
+
+  return {
+    root,
+    bass,
+    transposeLogic,
+  };
+};
+
+const baseTransposeLogic = {};
+
+console.log(genereateChordObjectFromString('C', baseTransposeLogic));
+
+/* F R O M   S T R I N G   E N D */
+
+/* T R A N S P O S E   L O G I C   S T A R T */
 
 /**
  * Method for transposing a chord object.
@@ -402,6 +440,10 @@ const transposeNoteObject = (originalNoteObject, transposeLength) => {
   return noteObjectList[newIndex];
 };
 
+/* T R A N S P O S E   L O G I C   E N D */
+
+/* T O   S T R I N G   S T A R T */
+
 /**
  * Method for displaying a chord object as string.
  *
@@ -440,6 +482,9 @@ const chordObjectToString = (chordObject) => {
 
   return resultString;
 };
+
+const chordObjectToTransposedString = (chordObject) =>
+  chordObjectToString(transposeChordObject(chordObject));
 
 /**
  * Method for getting a nashville string from chord object.
@@ -542,3 +587,5 @@ const chordObjectToSolfegeString = (chordObject) => {
 
   return resultString;
 };
+
+/* T O   S T R I N G   E N D */
