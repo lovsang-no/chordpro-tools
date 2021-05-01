@@ -65,10 +65,10 @@ const assertEqualLineByLine = (
 };
 
 const testChordTranspose = (chordToTranspose, expectedResult, input = '') => {
+  chordToTranspose = new Chord(chordToTranspose, song.logicWrapper);
   assertEqual(
     expectedResult,
-    song.logicWrapper.transposeChord(chordToTranspose),
-    input
+    chordObjectToString(transposeChordObject(chordToTranspose), input)
   );
 };
 
@@ -91,7 +91,7 @@ const correctTranspose = {
     F: ['F', 'Gm', 'Am', 'Bb', 'C', 'Dm', 'Edim'],
     'F#': ['F#', 'G#m', 'A#m', 'B', 'C#', 'D#m', 'E#dim'],
     G: ['G', 'Am', 'Bm', 'C', 'D', 'Em', 'F#dim'],
-    Gb: ['Gb', 'Abm', 'Bbm', 'Cb', 'Db', 'Ebm', 'Fbdim'],
+    Gb: ['Gb', 'Abm', 'Bbm', 'Cb', 'Db', 'Ebm', 'Fdim'],
     Ab: ['Ab', 'Bbm', 'Cm', 'Db', 'Eb', 'Fm', 'Gdim'],
     A: ['A', 'Bm', 'C#m', 'D', 'E', 'F#m', 'G#dim'],
     B: ['B', 'C#m', 'D#m', 'E', 'F#', 'G#m', 'A#dim'],
@@ -116,10 +116,12 @@ const correctTranspose = {
 };
 
 const testTransposingOfAllChordsInKey = (key, transpose = 0) => {
+  beforeEach('testTransposingOfAllChordsInKey(key: ' + key + ')');
   const minor = key.endsWith('m');
   const chordList = minor
     ? correctTranspose.minor[key]
     : correctTranspose.major[key];
+
   setKey(key);
   setTranspose(transpose);
   const transposedKey = song.logicWrapper.getTransposedKey();
@@ -130,7 +132,9 @@ const testTransposingOfAllChordsInKey = (key, transpose = 0) => {
       : correctTranspose.major[transposedKey];
   } catch (e) {
     throw new Error(
-      'Test fails in testTransposingOfAllChordsInKey() - cant get list for new key'
+      'Test fails in testTransposingOfAllChordsInKey(' +
+        key +
+        ') - cant get list for new key'
     );
   }
   chordList.forEach((chord, index) => {
@@ -209,97 +213,6 @@ const testTransposingOfComplexChords = () => {
         },
       ],
     },
-    {
-      key: 'Cm',
-      tests: [
-        {
-          chord: 'Cmsus4',
-          transposings: [
-            { transpose: 1, correctTransposedChord: 'C#msus4' },
-            { transpose: 7, correctTransposedChord: 'F#msus4' },
-            { transpose: 12, correctTransposedChord: 'Bmsus4' },
-          ],
-        },
-      ],
-    },
-    {
-      key: 'Dm',
-      tests: [
-        {
-          chord: 'Ab/Cb',
-          transposings: [
-            { transpose: 0, correctTransposedChord: 'Ab/Cb' },
-            { transpose: 1, correctTransposedChord: 'A/C' },
-            { transpose: 2, correctTransposedChord: 'A/C' },
-            { transpose: 3, correctTransposedChord: 'A#/C#' },
-            { transpose: 4, correctTransposedChord: 'B/D' },
-          ],
-        },
-        {
-          chord: 'Fb',
-          transposings: [
-            /*             { transpose: 0, correctTransposedChord: 'Fb' },
-             */ { transpose: 1, correctTransposedChord: 'E#' },
-          ],
-        },
-        {
-          chord: 'C#',
-          transposings: [
-            /* { transpose: 0, correctTransposedChord: 'Db' } */ {
-              transpose: -2,
-              correctTransposedChord: 'B',
-            },
-          ],
-        },
-        /* {
-          chord: 'Cb/C#',
-          transposings: [{ transpose: 0, correctTransposedChord: 'Cb/Db' }],
-        }, */
-        {
-          chord: 'A/C#',
-          transposings: [
-            /* { transpose: 0, correctTransposedChord: 'A/Db' } */ {
-              transpose: -2,
-              correctTransposedChord: 'G/B',
-            },
-          ],
-        },
-        {
-          chord: 'A#/C#',
-          transposings: [{ transpose: -1, correctTransposedChord: 'A/C' }],
-        },
-        /*  {
-          chord: 'A/C#',
-          transposings: [{ transpose: 0, correctTransposedChord: 'A/Db' }],
-        }, */
-        {
-          chord: 'Db',
-          transposings: [
-            { transpose: 0, correctTransposedChord: 'Db' },
-            { transpose: -2, correctTransposedChord: 'B' },
-          ],
-        },
-      ],
-    },
-    {
-      key: 'Bbm',
-      tests: [
-        {
-          chord: 'DbMsus',
-          transposings: [
-            { transpose: 7, correctTransposedChord: 'GMsus' },
-            { transpose: 12, correctTransposedChord: 'CMsus' },
-          ],
-        },
-        {
-          chord: 'Db-',
-          transposings: [
-            { transpose: 7, correctTransposedChord: 'G-' },
-            { transpose: 12, correctTransposedChord: 'C-' },
-          ],
-        },
-      ],
-    },
   ];
 
   complexChordTests.forEach((complexChordTest) => {
@@ -312,7 +225,12 @@ const testTransposingOfComplexChords = () => {
         const logState = transposing.correctTransposedChord === '';
         assertEqual(
           transposing.correctTransposedChord,
-          song.logicWrapper.transposeChord(test.chord, logState),
+          chordObjectToString(
+            transposeChordObject(
+              new Chord(test.chord, song.logicWrapper),
+              logState
+            )
+          ),
           test.chord +
             ', ' +
             transposing.transpose +
