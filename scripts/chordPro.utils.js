@@ -137,7 +137,7 @@ const noteObjectList = [
     },
     solfege: {
       major: { sharp: 'Do', flat: 'Do' },
-      minor: { sharp: '', flat: '' },
+      minor: { sharp: 'La', flat: 'La' },
     },
   },
   {
@@ -151,7 +151,7 @@ const noteObjectList = [
     },
     solfege: {
       major: { sharp: 'Di', flat: 'Ra' },
-      minor: { sharp: '', flat: '' },
+      minor: { sharp: 'Li', flat: 'Te' },
     },
   },
   {
@@ -160,12 +160,12 @@ const noteObjectList = [
     sharp: ['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D'],
     flat: ['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D'],
     nashville: {
-      major: { sharp: 'Re', flat: 'R' },
+      major: { sharp: '2', flat: '2' },
       minor: { sharp: '2', flat: '2' },
     },
     solfege: {
       major: { sharp: 'Re', flat: 'Re' },
-      minor: { sharp: '', flat: '' },
+      minor: { sharp: 'Ti', flat: 'Ti' },
     },
   },
   {
@@ -178,8 +178,8 @@ const noteObjectList = [
       minor: { sharp: '3', flat: '3' },
     },
     solfege: {
-      major: { sharp: 'Ri', flat: 'M' },
-      minor: { sharp: '', flat: '' },
+      major: { sharp: 'Ri', flat: 'Me' },
+      minor: { sharp: 'Do', flat: 'Do' },
     },
   },
   {
@@ -192,8 +192,8 @@ const noteObjectList = [
       minor: { sharp: '3#', flat: '4b' },
     },
     solfege: {
-      major: { sharp: '', flat: '' },
-      minor: { sharp: '', flat: '' },
+      major: { sharp: 'Mi', flat: 'Mi' },
+      minor: { sharp: 'Di', flat: 'Ra' },
     },
   },
   {
@@ -206,8 +206,8 @@ const noteObjectList = [
       minor: { sharp: '4', flat: '4' },
     },
     solfege: {
-      major: { sharp: '', flat: '' },
-      minor: { sharp: '', flat: '' },
+      major: { sharp: 'Fa', flat: 'Fa' },
+      minor: { sharp: 'Re', flat: 'Re' },
     },
   },
   {
@@ -220,8 +220,8 @@ const noteObjectList = [
       minor: { sharp: '4#', flat: '5b' },
     },
     solfege: {
-      major: { sharp: '', flat: '' },
-      minor: { sharp: '', flat: '' },
+      major: { sharp: 'Fi', flat: 'Se' },
+      minor: { sharp: 'Ri', flat: 'Me' },
     },
   },
   {
@@ -234,8 +234,8 @@ const noteObjectList = [
       minor: { sharp: '5', flat: '5' },
     },
     solfege: {
-      major: { sharp: '', flat: '' },
-      minor: { sharp: '', flat: '' },
+      major: { sharp: 'Sol', flat: 'Sol' },
+      minor: { sharp: 'Mi', flat: 'Mi' },
     },
   },
   {
@@ -248,8 +248,8 @@ const noteObjectList = [
       minor: { sharp: '6', flat: '6' },
     },
     solfege: {
-      major: { sharp: '', flat: '' },
-      minor: { sharp: '', flat: '' },
+      major: { sharp: 'Si', flat: 'Le' },
+      minor: { sharp: 'Fa', flat: 'Fa' },
     },
   },
   {
@@ -262,8 +262,8 @@ const noteObjectList = [
       minor: { sharp: '6#', flat: '7b' },
     },
     solfege: {
-      major: { sharp: '', flat: '' },
-      minor: { sharp: '', flat: '' },
+      major: { sharp: 'La', flat: 'La' },
+      minor: { sharp: 'Fi', flat: 'Se' },
     },
   },
   {
@@ -276,8 +276,8 @@ const noteObjectList = [
       minor: { sharp: '7', flat: '7' },
     },
     solfege: {
-      major: { sharp: '', flat: '' },
-      minor: { sharp: '', flat: '' },
+      major: { sharp: 'Li', flat: 'Te' },
+      minor: { sharp: 'Sol', flat: 'Sol' },
     },
   },
   {
@@ -290,8 +290,8 @@ const noteObjectList = [
       minor: { sharp: '7b', flat: '1b' },
     },
     solfege: {
-      major: { sharp: '', flat: '' },
-      minor: { sharp: '', flat: '' },
+      major: { sharp: 'Ti', flat: 'Ti' },
+      minor: { sharp: 'Si', flat: 'Le' },
     },
   },
 ];
@@ -315,7 +315,7 @@ const chordObjectTemplate = {
  * @param {*} chordString
  * @returns
  */
-const getInitialChordObjectFromString = (chordString) => {
+const chordPartObjectFromString = (chordString) => {
   const regex = /([CDEFGABC][b#]?)/g;
 
   /* If H change to B */
