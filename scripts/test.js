@@ -400,7 +400,7 @@ const run = () => {
   testAllTransposingsFromC();
   testTransposingOfComplexChords();
   testTransposingOfTemplate();
-  transposeOnelinersAndPrint();
+  //  transposeOnelinersAndPrint();
   console.warn('All tests passed!');
 };
 
