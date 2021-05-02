@@ -152,7 +152,7 @@ const spaces = (number, space = ' ') => {
 
 class Song {
   constructor(template, bypassMeta = false) {
-    this.logicWrapper = new LogicWrapper();
+    this.logicWrapper = new TransposeLogic();
     this.metadata = new MetaData();
     this.sections = [];
     this.parseTargets = new Map();
@@ -227,7 +227,7 @@ class Song {
           let oneLineBuffer = [];
           line.split(' ').forEach((chord) => {
             chord = isChord(chord.unwrapChord())
-              ? new Chord(chord.unwrapChord(), this.logicWrapper)
+              ? newChordObjectFromString(chord.unwrapChord(), this.logicWrapper)
               : chord.unwrapChord();
             oneLineBuffer.push(chord);
           });
@@ -355,7 +355,7 @@ class Song {
 
   reInitialize(template) {
     this.sections = [];
-    this.logicWrapper = new LogicWrapper();
+    this.logicWrapper = new TransposeLogic();
     this.metadata = new MetaData();
     this.intialize(template);
     this.reRender();
@@ -455,10 +455,10 @@ class Song {
             switch (line.TYPE) {
               case 'ONELINE':
                 lineBuffer = [];
-                line.oneLine.forEach((e) => {
-                  if (e instanceof Chord)
-                    lineBuffer.push('[' + e.transposedChord() + ']');
-                  else lineBuffer.push('[' + e + ']');
+                line.oneLine.forEach((oneLineObject) => {
+                  lineBuffer.push(
+                    '[' + chordObjectToTransposedString(oneLineObject) + ']'
+                  );
                 });
                 mainBuffer.push(lineBuffer.join(' '));
                 break;
@@ -468,8 +468,9 @@ class Song {
               case 'LYRICS_AND_CHORDS':
                 lineBuffer = [];
                 line.pairs.forEach((pair) => {
-                  if (pair.chord)
-                    lineBuffer.push('[' + pair.chord.transposedChord() + ']');
+                  lineBuffer.push(
+                    '[' + chordObjectToTransposedString(pair.chord) + ']'
+                  );
                   if (pair.lyrics) lineBuffer.push(pair.lyrics);
                 });
                 mainBuffer.push(lineBuffer.join(''));
@@ -540,7 +541,7 @@ class SongLine {
   addLyricPair(chord, lyrics) {
     this.TYPE = 'LYRICS_AND_CHORDS';
     let crd = null;
-    if (chord) crd = new Chord(chord, this.logicWrapper);
+    if (chord) crd = newChordObjectFromString(chord, this.logicWrapper);
     let pair = { chord: crd, lyrics: lyrics };
     this.pairs.push(pair);
   }
@@ -562,14 +563,11 @@ class SongLine {
       case 'ONELINE':
         let oneLineBuffer = [];
         this.oneLine.forEach((chordObject) => {
-          console.log('hallo', chordObject instanceof Chord);
-          let e =
-            chordObject instanceof Chord
-              ? chordObjectToTransposedString(chordObject).wrapHTML(
-                  'span',
-                  'cp-chord'
-                )
-              : chordObject.wrapHTML('span', 'cp-chord');
+          // WARN
+          let e = chordObjectToTransposedString(chordObject).wrapHTML(
+            'span',
+            'cp-chord'
+          );
           oneLineBuffer.push(e);
         });
         lineBuffer.push(oneLineBuffer.join(' ').wrapHTML('div'));
@@ -680,7 +678,7 @@ class Chord {
   }
 }
 
-class LogicWrapper {
+class TransposeLogic {
   constructor(key) {
     this.transposeStep = 0;
     this.keyIsMinor = undefined;
@@ -755,7 +753,153 @@ class LogicWrapper {
   }
 }
 
-chordObjectToSolfegeString(new Chord('C', new LogicWrapper('C')));
+/* console.log(
+  transposeChordObject(newChordObjectFromString('Dm', new TransposeLogic('Dm')))
+); */
+const javel = {
+  root: {
+    noteObject: {
+      halfNotesFromC: 2,
+      variants: ['D'],
+      sharp: ['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D'],
+      flat: ['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D'],
+      nashville: {
+        major: {
+          sharp: '2',
+          flat: '2',
+        },
+        minor: {
+          sharp: '2',
+          flat: '2',
+        },
+      },
+      solfege: {
+        major: {
+          sharp: 'Re',
+          flat: 'Re',
+        },
+        minor: {
+          sharp: 'Ti',
+          flat: 'Ti',
+        },
+      },
+    },
+    quality: 'm',
+  },
+  bass: null,
+  transposeLogic: {
+    transposeStep: 0,
+    keyIsMinor: true,
+    key: 'Dm',
+    keys: [
+      {
+        key: 'Cm',
+        index: 0,
+        listIndex: 0,
+        flats: 3,
+        isMinor: true,
+      },
+      {
+        key: 'C#m',
+        index: 1,
+        listIndex: 1,
+        sharps: 4,
+        isMinor: true,
+      },
+      {
+        key: 'Dm',
+        index: 2,
+        listIndex: 2,
+        flats: 2,
+        isMinor: true,
+      },
+      {
+        key: 'D#m',
+        index: 3,
+        listIndex: 3,
+        sharps: 6,
+        isMinor: true,
+      },
+      {
+        key: 'Ebm',
+        index: 3,
+        listIndex: 4,
+        flats: 6,
+        isMinor: true,
+      },
+      {
+        key: 'Em',
+        index: 4,
+        listIndex: 5,
+        sharps: 1,
+        isMinor: true,
+      },
+      {
+        key: 'Fm',
+        index: 5,
+        listIndex: 6,
+        flats: 4,
+        isMinor: true,
+      },
+      {
+        key: 'F#m',
+        index: 6,
+        listIndex: 7,
+        sharps: 3,
+        isMinor: true,
+      },
+      {
+        key: 'Gm',
+        index: 7,
+        listIndex: 8,
+        flats: 2,
+        isMinor: true,
+      },
+      {
+        key: 'G#m',
+        index: 8,
+        listIndex: 9,
+        sharps: 5,
+        isMinor: true,
+      },
+      {
+        key: 'Am',
+        index: 9,
+        listIndex: 10,
+        sharps: 0,
+        isMinor: true,
+      },
+      {
+        key: 'Bbm',
+        index: 10,
+        listIndex: 11,
+        flats: 5,
+        isMinor: true,
+      },
+      {
+        key: 'Bm',
+        index: 11,
+        listIndex: 12,
+        sharps: 2,
+        isMinor: true,
+      },
+    ],
+    currentKeyObject: {
+      key: 'Dm',
+      index: 2,
+      listIndex: 2,
+      flats: 2,
+      isMinor: true,
+    },
+    originalKeyObject: {
+      key: 'Dm',
+      index: 2,
+      listIndex: 2,
+      flats: 2,
+      isMinor: true,
+    },
+  },
+};
 
 const templateTest = `Jeg vil følge
 Impuls
@@ -773,7 +917,7 @@ D[D]u kom til m[D/C#]eg og jeg fikk s[G]e hvem du var
 Din d[Em]ød ble mitt liv
 
 Bro:
-[Bm7]Og Jesus h[G]er står jeg ved ditt k[D]ors
+[Magnus]Og Jesus h[G]er står jeg ved ditt k[D]ors
 og hører du [D/C#]kaller navnet m[Bm7]itt
 Og Jesus h[G]er står jeg ved ditt k[D]ors
 og hører du k[G]aller meg, k[F#sus]aller me[F#]g
@@ -784,7 +928,7 @@ Jesus [D]du ga meg alt å [Asus4]leve for[A]
 Da d[Bm7]u ble korsfestet ble je[G]g satt fri
 For [E]se jeg var død men har [Asus4]nå fått li[A]v
 Jeg vil [E]følge deg, 
-Jesus [G]du som har all fremtid for m[D]eg[D/C#] [Bm7] [G]
+Jesus [G]du som har all fremtid for m[D]eg[D/C#]afsdf[Bm7]fdkljds [G]
 
 Vers 2:
 D[D]u som kom [D/C#]fra, et liv i h[G]erlighet, 
@@ -793,5 +937,9 @@ D[D]u som kom [D/C#]fra, et liv i h[G]erlighet,
 en f[Em]remmed du ble
 
 Her er jeg
-
+Her er jeg   
+Her er jeg
+Her er jeg
+Her er jeg   
+Her er jeg
   `;

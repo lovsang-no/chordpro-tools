@@ -54,6 +54,12 @@ const getHelperStyles = () => {
   return styleElement;
 };
 
+/**
+ * Method for saving a .txt file.
+ *
+ * @param {string} textToWrite
+ * @param {string} filename
+ */
 const saveTextAsFile = (textToWrite, filename) => {
   /* Source: https://stackoverflow.com/questions/21479107/saving-html5-textarea-contents-to-file/42864235  */
   const textFileAsBlob = new Blob([textToWrite], { type: 'text/plain' });
@@ -120,7 +126,7 @@ const generateHelperStyleSheetSwitch = () => {
 };
 
 const adjustKey = (input) => {
-  switch (input.innerText) {
+  /* switch (input.innerText) {
     case 'A#':
       input.innerText = 'Bb';
       break;
@@ -133,7 +139,7 @@ const adjustKey = (input) => {
     case 'G#':
       input.innerText = 'G#';
       break;
-  }
+  } */
 };
 
 const generateChordProSectionObject = () => {
@@ -155,8 +161,8 @@ const generateChordProSectionObject = () => {
   boxResultWrapper.appendChild(boxResultLabel);
   boxResultLabel.innerHTML = lang.boxes.result.label;
   const boxResultContent = newElement('DIV', 'box-content');
-  const target = newElement('DIV');
-  boxResultContent.appendChild(target);
+  const chordProTarget = newElement('DIV');
+  boxResultContent.appendChild(chordProTarget);
   boxResultWrapper.appendChild(boxResultContent);
 
   /* Helper styles */
@@ -358,13 +364,19 @@ const generateChordProSectionObject = () => {
     return res;
   };
 
-  let song = new SongEdit();
+  let song = newSongObjectFromTemplate(sheetToCp(generatedTemplate));
+
+  const renderCallback = () => {
+    chordProTarget.innerHTML = songObjectToHtmlTable(song) ?? '';
+  };
 
   const rerenderTarget = () => {
-    song.reInitialize(sheetToCp(generatedTemplate));
-    filename = song.generateFileName();
-    song.parseHTMLTable(target);
+    song = newSongObjectFromTemplate(sheetToCp(generatedTemplate));
+    //filename = song.generateFileName();
+    renderCallback();
   };
+
+  song.setRenderCallback(renderCallback);
 
   /* Fire change on input */
   const fireInputChange = () => {
@@ -517,10 +529,13 @@ const generateChordProSectionObject = () => {
     updateTemplate();
     fireInputChange();
   };
+
+  const currentKeyString = () => song.transposeLogic?.currentKeyObject?.key;
+
   const rerenderAfterTranspose = () => {
-    song.reRender();
+    renderCallback();
     if (metaDataInputs[5].span?.innerHTML)
-      metaDataInputs[5].span.innerHTML = song.logicWrapper.getTransposedKey();
+      metaDataInputs[5].span.innerHTML = currentKeyString();
   };
   const setValueToLabelAndInputIndex = (index, text) => {
     const obj = metaDataInputs[index];
@@ -528,13 +543,9 @@ const generateChordProSectionObject = () => {
     obj.input.value = text;
   };
   const setLabelsAndInputsFromSongObj = () => {
-    if (song.metadata.key)
-      setValueToLabelAndInputIndex(5, song.logicWrapper.getTransposedKey());
+    if (song.metadata.key) setValueToLabelAndInputIndex(5, currentKeyString());
     if (song.sections.length) {
-      setValueToLabelAndInputIndex(
-        11,
-        song.parseTransposedChordProOnlyChords()
-      );
+      setValueToLabelAndInputIndex(11, songObjectToChordPro(song, false, true));
     }
   };
   const transposeUp = () => {
