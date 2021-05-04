@@ -38,11 +38,64 @@
       media="screen"
       href="styles/chordpro.css"
     />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      media="screen"
+      href="styles/fileUpload.css"
+    />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      media="screen"
+      href="styles/feedback.css"
+    />
   </head>
 
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="target">Det dukket opp en feil. Prøv igjen</div>
+
+    <form
+      class="feedback-form"
+      name="feedback"
+      method="POST"
+      data-netlify="true"
+    >
+      <h1>Rapporter feil</h1>
+      <p>
+        Vi vil veldig gjerne høre fra deg dersom du oppdager feil eller noe som
+        ikke fungerer som forventet. Beskriv problemet, gjerne også hvordan det
+        oppstår, og legg ved skjermbilde.
+      </p>
+      <label>
+        <h4>Beskriv problemet:</h4>
+        <textarea
+          name="message"
+          rows="4"
+          class="textarea-span multiline"
+          required
+        ></textarea>
+      </label>
+      <div class="grid">
+        <div>
+          <label for="screenshot-input"><h4>Skjermbilde:</h4></label>
+          <div class="drop-zone">
+            <span class="drop-zone__prompt"
+              >Trykk eller slipp for å laste opp</span
+            >
+            <input
+              id="screenshot-input"
+              type="file"
+              name="screenshot"
+              class="drop-zone__input"
+            />
+          </div>
+        </div>
+        <button type="submit">Send</button>
+      </div>
+    </form>
 
     <script src="scripts/lang.js"></script>
     <script src="scripts/utils.js"></script>
@@ -55,6 +108,7 @@
     <script src="scripts/chordPro.song.js"></script>
     <script src="scripts/chordPro.display.js"></script>
     <script src="scripts/chordProEdit.js"></script>
+    <script src="scripts/fileUpload.js"></script>
     <script src="scripts/main.js"></script>
   </body>
 </html>
