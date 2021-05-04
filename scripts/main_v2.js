@@ -672,9 +672,6 @@ const generateLayout = (target) => {
   main.appendChild(formObject.DOMSection);
   appWrapper.appendChild(main);
 
-  /* Feedback form */
-  main.appendChild(FeedbackForm())
-
   /* Append app to target */
   target.innerHTML = '';
   target.appendChild(appWrapper);
