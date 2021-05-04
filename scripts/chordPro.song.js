@@ -608,27 +608,3 @@ const songObjectToChordPro = (
 
   return mainBuffer.join('\n');
 };
-
-/* 
-
-Example of use:
-
-*/
-const modsong = newSongObjectFromTemplate(templateTest);
-console.log(modsong);
-
-modsong.displayChords();
-console.log(modsong.getDisplayType());
-
-const renderCallback = () => {
-  document.querySelector('#target').innerHTML = songObjectToHtmlTable(modsong);
-};
-modsong.setRenderCallback(renderCallback);
-modsong.transposeUp(7);
-
-const hello = () => modsong.displayLyrics();
-
-document.body.innerHTML += `<button onclick="hello()">Hello</button>`;
-
-console.log(songObjectToChordPro(modsong));
-/**/
