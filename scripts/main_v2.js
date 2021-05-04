@@ -55,24 +55,6 @@ const getHelperStyles = () => {
 };
 
 
-const FeedbackForm = () => {
-  const e = newElement('div')
-
-  e.innerHTML = `
-    <form name="contact" method="POST" data-netlify-recaptcha="true" data-netlify="true">
-      <h1>Rapporter problem / feil</h1>
-      <p>
-        <label>Email: <input type="text" name="name" /></label>
-      </p>
-      <p>
-        <label>Message: <textarea name="message"></textarea></label>
-      </p>
-      <div data-netlify-recaptcha="true"></div>
-      <p>
-        <button type="submit">Send</button>
-      </p>
-    </form>`;
-  return e}
 
 /**
  * Method for saving a .txt file.
@@ -691,7 +673,7 @@ const generateLayout = (target) => {
   appWrapper.appendChild(main);
 
   /* Feedback form */
-  //main.appendChild( FeedbackForm())
+  main.appendChild(FeedbackForm())
 
   /* Append app to target */
   target.innerHTML = '';
