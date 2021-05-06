@@ -157,7 +157,7 @@ const newButton = (text) => {
   return { wrapper: buttonWrapper, button: button };
 };
 
-const userContent = [];
+let userContent = [];
 
 const KEY_VALIDATION = 'key_validation';
 const TEMPO_VALIDATION = 'tempo_validation';
@@ -230,7 +230,7 @@ const generateChordProSectionObject = () => {
   /* Metadata input grid */
   const metadataInputWrapper = newElement('DIV', 'metadata-input-grid');
   form.appendChild(metadataInputWrapper);
-
+  let exampleIsShowing = false;
   const metaDataInputTemplate = {
     name: '...',
     placeholder: '',
@@ -376,6 +376,7 @@ const generateChordProSectionObject = () => {
       isMultiline: true,
       validation: NOT_EMPTY,
       fullWidth: true,
+      autosave: true,
     },
   ];
 
@@ -429,12 +430,49 @@ const generateChordProSectionObject = () => {
 
   song.setRenderCallback(renderCallback);
 
+  const saveUserData = () => {
+    metaDataInputs.forEach((e, i) => {
+      if (!userContent[i] === undefined) userContent.push('');
+      userContent[i] = e.span.innerText;
+    });
+  };
+
+  const autosave = () => {
+    if (!exampleIsShowing) {
+      saveUserData();
+      console.log(userContent);
+      window.sessionStorage.setItem('chordpro', JSON.stringify({ content: userContent }));
+    }
+  };
+
   /* Fire change on input */
   const fireInputChange = () => {
     updateTemplate();
     rerenderTarget();
+    autosave();
   };
 
+  const backToUserData = () => {
+    exampleIsShowing = false;
+    boxInputWrapper.classList.remove('input-block');
+    userContent.forEach((content, i) => {
+      let e = metaDataInputs[i];
+      if (e) {
+        e.input.value = content;
+        e.span.innerText = e.input.value;
+      }
+    });
+    updateTemplate();
+    fireInputChange();
+  };
+
+  const loadFromSessionStorage = () => {
+    const localStorageString = window.sessionStorage.getItem('chordpro');
+    if (!localStorageString) return;
+    const localStorageContent = JSON.parse(localStorageString).content;
+    userContent = localStorageContent;
+    backToUserData();
+  };
   /* Metadata inputs */
   metaDataInputs.forEach((e) => {
     const label = newElement('LABEL', e.fullWidth ? 'full-width' : '');
@@ -531,14 +569,8 @@ const generateChordProSectionObject = () => {
     if (everythingIsFilledOut()) saveTextAsFile(sheetToCp(generatedTemplate), filename);
   };
 
-  const saveUserData = () => {
-    metaDataInputs.forEach((e, i) => {
-      if (!userContent[i] === undefined) userContent.push('');
-      userContent[i] = e.span.innerText;
-    });
-  };
-
   const applyExampleInput = () => {
+    exampleIsShowing = true;
     saveUserData();
     metaDataInputs.forEach((e, i) => {
       if (exampleObject[i]) {
@@ -552,27 +584,16 @@ const generateChordProSectionObject = () => {
   };
 
   const applyDefaultInput = () => {
+    console.log(defaultObject);
     metaDataInputs.forEach((e, i) => {
-      if (defaultObject[i]) {
+      if (defaultObject[i] !== undefined) {
         e.span.innerText = defaultObject[i];
       }
     });
+    exampleIsShowing = false;
   };
 
-  const backToUserData = () => {
-    boxInputWrapper.classList.remove('input-block');
-    userContent.forEach((content, i) => {
-      let e = metaDataInputs[i];
-      if (e) {
-        e.input.value = content;
-        e.span.innerText = e.input.value;
-      }
-    });
-    updateTemplate();
-    fireInputChange();
-  };
-
-  const currentKeyString = () => song.transposeLogic?.currentKeyObject?.key;
+  const currentKeyString = () => song.transposeLogic?.currentKeyObject?.key ?? '';
 
   const rerenderAfterTranspose = () => {
     renderCallback();
@@ -605,6 +626,8 @@ const generateChordProSectionObject = () => {
   };
 
   applyDefaultInput();
+  loadFromSessionStorage();
+
   return {
     DOMSection: section,
     template: generatedTemplate,
@@ -616,6 +639,7 @@ const generateChordProSectionObject = () => {
       up: transposeUp,
       down: transposeDown,
     },
+    reset: applyDefaultInput,
   };
 };
 
@@ -654,21 +678,30 @@ const generateLayout = (target) => {
   howTo.appendChild(howToButtonsWrapper);
   const exampleShow = newElement('A', 'button', 'how-to-button');
   const exampleHide = newElement('A', 'button', 'how-to-button');
+  const newSong = newElement('A', 'button', 'how-to-button');
   howToButtonsWrapper.appendChild(exampleShow);
   howToButtonsWrapper.appendChild(exampleHide);
+  howToButtonsWrapper.appendChild(newSong);
   exampleShow.innerHTML = lang.howTo.example.show;
   exampleHide.innerHTML = lang.howTo.example.hide;
+  newSong.innerHTML = lang.howTo.newSong;
   exampleHide.classList.add('hide');
 
   exampleShow.onclick = () => {
     exampleShow.classList.add('hide');
+    newSong.classList.add('hide');
     exampleHide.classList.remove('hide');
     formObject.exampleHandling.applyExample();
   };
   exampleHide.onclick = () => {
     exampleHide.classList.add('hide');
+    newSong.classList.remove('hide');
     exampleShow.classList.remove('hide');
     formObject.exampleHandling.revertToUserData();
+  };
+  newSong.onclick = () => {
+    console.log('reset');
+    formObject.reset();
   };
   appWrapper.appendChild(headerWrapper);
 
