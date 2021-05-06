@@ -17,6 +17,7 @@ const no = {
       show: 'Vis eksempel',
       hide: 'Skjul eksempel',
     },
+    newSong: 'Ny sang',
     title: 'Slik gjør du',
     list: [
       'Fyll inn data om sangen (* betyr at feltet er obligatorisk)',
@@ -68,7 +69,7 @@ const exampleObject = [
   `| G . . . | D . . . | Am . . . | C . . . | x2
 
 Vers 1:
-[G]Hvem     kan lyse opp min sti
+[G]Hvem kan lyse opp min sti
 Som en [Am]lykt for min f[Em]ot
 Gjøre natten om til dag
 Og gi meg nytt [D]mot
