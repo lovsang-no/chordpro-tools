@@ -19,8 +19,8 @@ const noteObjectList = [
     sharp: ['C#', 'C#', 'C#', 'C#', 'C#', 'C#', 'C#', 'C#'],
     flat: ['Db', 'Db', 'Db', 'Db', 'Db', 'Db', 'Db', 'Db'],
     nashville: {
-      major: { sharp: '1#', flat: '2b' },
-      minor: { sharp: '1#', flat: '2b' },
+      major: { sharp: '1#', flat: '♭2' },
+      minor: { sharp: '1#', flat: '♭2' },
     },
     solfege: {
       major: { sharp: 'DI', flat: 'RA' },
@@ -47,7 +47,7 @@ const noteObjectList = [
     sharp: ['D#', 'D#', 'D#', 'D#', 'D#', 'D#', 'D#', 'D#'],
     flat: ['Eb', 'Eb', 'Eb', 'Eb', 'Eb', 'Eb', 'Eb', 'Eb'],
     nashville: {
-      major: { sharp: '2#', flat: '3b' },
+      major: { sharp: '2#', flat: '♭3' },
       minor: { sharp: '3', flat: '3' },
     },
     solfege: {
@@ -62,7 +62,7 @@ const noteObjectList = [
     flat: ['E', 'E', 'E', 'E', 'E', 'E', 'E', 'E'],
     nashville: {
       major: { sharp: '3', flat: '3' },
-      minor: { sharp: '3#', flat: '4b' },
+      minor: { sharp: '3#', flat: '♭4' },
     },
     solfege: {
       major: { sharp: 'MI', flat: 'MI' },
@@ -89,8 +89,8 @@ const noteObjectList = [
     sharp: ['F#', 'F#', 'F#', 'F#', 'F#', 'F#', 'F#', 'F#'],
     flat: ['Gb', 'Gb', 'Gb', 'Gb', 'Gb', 'Gb', 'Gb', 'Gb'],
     nashville: {
-      major: { sharp: '4#', flat: '5b' },
-      minor: { sharp: '4#', flat: '5b' },
+      major: { sharp: '4#', flat: '♭5' },
+      minor: { sharp: '4#', flat: '♭5' },
     },
     solfege: {
       major: { sharp: 'FI', flat: 'SE' },
@@ -117,7 +117,7 @@ const noteObjectList = [
     sharp: ['G#', 'G#', 'G#', 'G#', 'G#', 'G#', 'G#', 'G#'],
     flat: ['Ab', 'Ab', 'Ab', 'Ab', 'Ab', 'Ab', 'Ab', 'Ab'],
     nashville: {
-      major: { sharp: '5#', flat: '6b' },
+      major: { sharp: '5#', flat: '♭6' },
       minor: { sharp: '6', flat: '6' },
     },
     solfege: {
@@ -132,7 +132,7 @@ const noteObjectList = [
     flat: ['A', 'A', 'A', 'A', 'A', 'A', 'A', 'A'],
     nashville: {
       major: { sharp: '6', flat: '6' },
-      minor: { sharp: '6#', flat: '7b' },
+      minor: { sharp: '6#', flat: '♭7' },
     },
     solfege: {
       major: { sharp: 'LA', flat: 'LA' },
@@ -145,7 +145,7 @@ const noteObjectList = [
     sharp: ['A#', 'A#', 'A#', 'A#', 'A#', 'A#', 'A#', 'A#'],
     flat: ['Bb', 'Bb', 'Bb', 'Bb', 'Bb', 'Bb', 'Bb', 'Bb'],
     nashville: {
-      major: { sharp: '6#', flat: '7b' },
+      major: { sharp: '6#', flat: '♭7' },
       minor: { sharp: '7', flat: '7' },
     },
     solfege: {
@@ -160,7 +160,7 @@ const noteObjectList = [
     flat: ['B', 'B', 'B', 'B', 'B', 'B', 'Cb', 'Cb'],
     nashville: {
       major: { sharp: '7', flat: '7' },
-      minor: { sharp: '7b', flat: '1b' },
+      minor: { sharp: '7b', flat: '♭1' },
     },
     solfege: {
       major: { sharp: 'TI', flat: 'TI' },
@@ -181,12 +181,10 @@ const chordPartObjectFromString = (chordString) => {
   const regex = /([CDEFGABC][b#]?)/g;
 
   /* If H change to B */
-  if (chordString.startsWith('H'))
-    chordString = 'B' + chordString.substr(1, chordString.length);
+  if (chordString.startsWith('H')) chordString = 'B' + chordString.substr(1, chordString.length);
 
   /* If chord is invalid */
-  if (!chordString.match(regex))
-    throw new EvalError('Chord string does not match regex.');
+  if (!chordString.match(regex)) throw new EvalError('Chord string does not match regex.');
 
   const rootNoteFromString = chordString.match(regex)[0];
   const quality = chordString.split(regex)[2];
@@ -223,12 +221,8 @@ const newChordObjectFromString = (chordString, transposeLogic) => {
   const rootChordString = chordParts[0];
   const bassChordString = chordParts[1];
 
-  const root = rootChordString
-    ? chordPartObjectFromString(rootChordString)
-    : null;
-  const bass = bassChordString
-    ? chordPartObjectFromString(bassChordString)
-    : null;
+  const root = rootChordString ? chordPartObjectFromString(rootChordString) : null;
+  const bass = bassChordString ? chordPartObjectFromString(bassChordString) : null;
 
   return {
     root,
@@ -273,12 +267,8 @@ const transposeChordObject = (chordObject) => {
 
   return {
     ...chordObject,
-    root: chordObject.root
-      ? { ...chordObject.root, noteObject: newRootNoteObject }
-      : null,
-    bass: chordObject.bass
-      ? { ...chordObject.bass, noteObject: newBassNoteObject }
-      : null,
+    root: chordObject.root ? { ...chordObject.root, noteObject: newRootNoteObject } : null,
+    bass: chordObject.bass ? { ...chordObject.bass, noteObject: newBassNoteObject } : null,
   };
 };
 
@@ -309,8 +299,7 @@ const transposeNoteObject = (originalNoteObject, transposeLength) => {
  * @returns {string} Chord as string
  */
 const chordObjectToString = (chordObject) => {
-  if (!chordObject.transposeLogic?.transposeStep)
-    return chordObject.originalString;
+  if (!chordObject.transposeLogic?.transposeStep) return chordObject.originalString;
   let resultString = '';
 
   const root = chordObject.root;
@@ -362,7 +351,7 @@ const chordObjectToOriginalString = (chordObject) => chordObject.originalString;
  * @param {object} chordObject - Chord object to show as string
  * @returns {string} Chord as nashville string
  */
-const chordObjectToNashvilleString = (chordObject) => {
+const chordObjectToNashvilleString = (chordObject, useFlat) => {
   /* Transpose to C */
   const transposeBy = chordObject.transposeLogic.currentKeyObject.listIndex;
   chordObject.transposeLogic.transposeDown(transposeBy);
@@ -374,7 +363,6 @@ const chordObjectToNashvilleString = (chordObject) => {
   const oldBass = chordObject.bass;
 
   const isMinor = chordObject.transposeLogic.currentKeyObject.isMinor;
-  const useFlat = chordObject.transposeLogic.currentKeyObject.isBKey;
 
   if (isMinor) {
     if (oldRoot) {
@@ -459,11 +447,11 @@ const chordObjectToSolfegeString = (chordObject) => {
 };
 
 const chordObjectToStringBasedOnDisplayType = (chordObject, displayType) => {
-  switch (displayType) {
+  switch (displayType.type) {
     case DISPLAY_CHORDS:
       return chordObjectToTransposedString(chordObject);
     case DISPLAY_NASHVILLE:
-      return chordObjectToNashvilleString(chordObject);
+      return chordObjectToNashvilleString(chordObject, displayType.nashvilleUseFlat);
     case DISPLAY_SOLFEGE:
       return chordObjectToSolfegeString(chordObject);
     default:

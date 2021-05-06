@@ -35,7 +35,7 @@ const newSongObjectFromTemplate = (template, bypassMeta = false) => {
   };
 
   /* Object contents */
-  const displayType = [DISPLAY_CHORDS];
+  const displayType = { type: DISPLAY_CHORDS, nashvilleUseFlat: true };
   const sections = [];
   const transposeLogic = {
     transposeStep: 0,
@@ -51,7 +51,7 @@ const newSongObjectFromTemplate = (template, bypassMeta = false) => {
      * @returns key object
      */
     getKeyObjectFromKeyString: (key) =>
-      transposeLogic.keys.find((x) => x.key === key),
+      transposeLogic.keys.find((x) => x.variants.indexOf(key) !== -1),
     /**
      * Method for updating transpose logic objects currenct key object.
      *
@@ -59,7 +59,7 @@ const newSongObjectFromTemplate = (template, bypassMeta = false) => {
      */
     updateCurrentKeyObject: () => {
       const originalIndex = transposeLogic.originalKeyObject.listIndex;
-      if (originalIndex === -1) return null;
+      if (originalIndex === -1) throw new Error('Could not find key.');
       const newListIndex = modifiedModulo(
         transposeLogic.transposeStep + originalIndex,
         transposeLogic.keys.length
@@ -76,9 +76,7 @@ const newSongObjectFromTemplate = (template, bypassMeta = false) => {
       transposeLogic.key = key;
       keyIsMinor = key.endsWith('m');
       transposeLogic.keys = keyIsMinor ? keyObjects.minor : keyObjects.major;
-      transposeLogic.originalKeyObject = transposeLogic.getKeyObjectFromKeyString(
-        key
-      );
+      transposeLogic.originalKeyObject = transposeLogic.getKeyObjectFromKeyString(key);
       transposeLogic.currentKeyObject = transposeLogic.originalKeyObject;
       transposeLogic.updateCurrentKeyObject();
     },
@@ -136,22 +134,22 @@ const newSongObjectFromTemplate = (template, bypassMeta = false) => {
   };
 
   const displayChords = () => {
-    displayType[0] = DISPLAY_CHORDS;
+    displayType.type = DISPLAY_CHORDS;
     renderCallback();
   };
   const displayLyrics = () => {
-    displayType[0] = DISPLAY_LYRICS;
+    displayType.type = DISPLAY_LYRICS;
     renderCallback();
   };
-  const displayNashville = () => {
-    displayType[0] = DISPLAY_NASHVILLE;
+  const displayNashville = (useFlat = true) => {
+    displayType.type = DISPLAY_NASHVILLE;
+    displayType.nashvilleUseFlat = useFlat;
     renderCallback();
   };
   const displaySolfege = () => {
-    displayType[0] = DISPLAY_SOLFEGE;
+    displayType.type = DISPLAY_SOLFEGE;
     renderCallback();
   };
-  const getDisplayType = () => displayType[0];
 
   template
     .trim()
@@ -166,10 +164,7 @@ const newSongObjectFromTemplate = (template, bypassMeta = false) => {
           let type; // CHORD | DIVIDER
           let word;
           try {
-            word = newChordObjectFromString(
-              chordElement.unwrapChord(),
-              transposeLogic
-            );
+            word = newChordObjectFromString(chordElement.unwrapChord(), transposeLogic);
             type = CHORD_LINE_CHORD;
           } catch (error) {
             word = chordElement.unwrapChord();
@@ -247,8 +242,7 @@ const newSongObjectFromTemplate = (template, bypassMeta = false) => {
         } else {
           let LINETYPE;
           if (!meta_section_passed && linenum === 0) LINETYPE = 'SONG_TITLE';
-          else if (!meta_section_passed && linenum === 1)
-            LINETYPE = 'SONG_ARTIST';
+          else if (!meta_section_passed && linenum === 1) LINETYPE = 'SONG_ARTIST';
           else if (line.trim().endsWith(':')) LINETYPE = 'SECTION_START';
           else if (line.trim() === '' && !meta_section_passed) {
             LINETYPE = 'META_END';
@@ -282,10 +276,7 @@ const newSongObjectFromTemplate = (template, bypassMeta = false) => {
                   lyrics: line,
                 });
               } else {
-                metadata.extra.set(
-                  line.split(':')[0].trim(),
-                  line.split(':')[1]?.trim() ?? ''
-                );
+                metadata.extra.set(line.split(':')[0].trim(), line.split(':')[1]?.trim() ?? '');
               }
               break;
             default:
@@ -311,7 +302,6 @@ const newSongObjectFromTemplate = (template, bypassMeta = false) => {
     displayLyrics,
     displayNashville,
     displaySolfege,
-    getDisplayType,
   };
 
   return song;
@@ -324,8 +314,7 @@ const newSongObjectFromTemplate = (template, bypassMeta = false) => {
  */
 const sectionObjectToHtmlTable = (section, displayType) => {
   const sectionBuffer = [];
-  if (section.title)
-    sectionBuffer.push(section.title.wrapHTML('div', 'cp-heading'));
+  if (section.title) sectionBuffer.push(section.title.wrapHTML('div', 'cp-heading'));
 
   section.lines.forEach((line) => {
     const lineBuffer = [];
@@ -348,22 +337,16 @@ const sectionObjectToHtmlTable = (section, displayType) => {
           const chordObject = pair.chord;
           const lyrics = pair.lyrics;
           chordLine = chordObject
-            ? chordObjectToStringBasedOnDisplayType(
-                chordObject,
-                displayType
-              ).wrapHTML('span', 'cp-chord') + '&nbsp'.repeat(2)
+            ? chordObjectToStringBasedOnDisplayType(chordObject, displayType).wrapHTML(
+                'span',
+                'cp-chord'
+              ) + '&nbsp'.repeat(2)
             : '';
           lyricsLine = lyrics ? lyrics.replaceAll(' ', '&nbsp') : '&nbsp';
           const tableCell = (chordLine + '<br>' + lyricsLine).wrapHTML('td');
           tableBuffer.push(tableCell);
         }
-        lineBuffer.push(
-          tableBuffer
-            .join('\n')
-            .wrapHTML('tr')
-            .wrapHTML('tbody')
-            .wrapHTML('table')
-        );
+        lineBuffer.push(tableBuffer.join('\n').wrapHTML('tr').wrapHTML('tbody').wrapHTML('table'));
         break;
 
       case LYRCIS_LINE:
@@ -383,8 +366,7 @@ const sectionObjectToHtmlTable = (section, displayType) => {
  */
 const sectionObjectToLyrics = (section) => {
   const sectionBuffer = [];
-  if (section.title)
-    sectionBuffer.push(section.title.wrapHTML('div', 'cp-heading'));
+  if (section.title) sectionBuffer.push(section.title.wrapHTML('div', 'cp-heading'));
 
   const linesBuffer = [];
   section.lines.forEach((line) => {
@@ -407,8 +389,7 @@ const sectionObjectToLyrics = (section) => {
 
   if (linesBuffer.length) sectionBuffer.push(linesBuffer.join('<br>'));
 
-  if (sectionBuffer.length)
-    return sectionBuffer.join('\n').wrapHTML('div', 'cp-section') + '<br>';
+  if (sectionBuffer.length) return sectionBuffer.join('\n').wrapHTML('div', 'cp-section') + '<br>';
   else return '';
 };
 
@@ -473,21 +454,27 @@ const sectionObjectToChordPro = (section, originalString = true) => {
  * @param {*} transposeLogic
  * @returns
  */
-const metadataObjectToHtml = (metadata, transposeLogic, excludeKey = false) => {
+const metadataObjectToHtml = (metadata, transposeLogic, displayType) => {
   /* Metadata start */
+  const hideKeyDisplayTypes = [DISPLAY_LYRICS];
+  const excludeKey = hideKeyDisplayTypes.indexOf(displayType.type) !== -1;
+  const showOriginalKeyDisplayTypes = [DISPLAY_NASHVILLE, DISPLAY_SOLFEGE];
+  const showOriginalKey = showOriginalKeyDisplayTypes.indexOf(displayType.type) !== -1;
+
   const metaBuffer = [];
-  if (metadata.title)
-    metaBuffer.push(metadata.title.wrapHTML('div', 'cp-song-title'));
-  if (metadata.artist)
-    metaBuffer.push(metadata.artist.wrapHTML('div', 'cp-song-artist'));
-  if (transposeLogic.currentKeyObject && !excludeKey)
-    metaBuffer.push(
-      ('Toneart: ' + transposeLogic.currentKeyObject.key).wrapHTML('div')
-    );
+
+  if (metadata.title) metaBuffer.push(metadata.title.wrapHTML('div', 'cp-song-title'));
+  if (metadata.artist) metaBuffer.push(metadata.artist.wrapHTML('div', 'cp-song-artist'));
+  if (!excludeKey) {
+    if (!showOriginalKey && transposeLogic.currentKeyObject)
+      metaBuffer.push(('Toneart: ' + transposeLogic.currentKeyObject.key).wrapHTML('div'));
+    if (showOriginalKey && transposeLogic.originalKeyObject)
+      metaBuffer.push(
+        ('Original toneart: ' + transposeLogic.originalKeyObject.key).wrapHTML('div')
+      );
+  }
   if (metadata.tempo)
-    metaBuffer.push(
-      (metadata.tempo + ' BPM ' + (metadata.time ?? '')).wrapHTML('div')
-    );
+    metaBuffer.push((metadata.tempo + ' BPM ' + (metadata.time ?? '')).wrapHTML('div'));
   for (let [key, value] of metadata.extra) {
     metaBuffer.push((key + ': ' + value).wrapHTML('div'));
   }
@@ -532,18 +519,13 @@ const songObjectToHtmlTable = (songObject, bypassMeta = false) => {
   }
 
   const mainBuffer = [];
-  const displayType = songObject.getDisplayType();
+  const displayType = songObject.displayType;
 
   /* Metadata start */
-  const excludeKeyFromMetadataDisplayTypes = [
-    DISPLAY_NASHVILLE,
-    DISPLAY_SOLFEGE,
-    DISPLAY_LYRICS,
-  ];
   const metadataString = metadataObjectToHtml(
     songObject.metadata,
     songObject.transposeLogic,
-    excludeKeyFromMetadataDisplayTypes.indexOf(displayType) !== -1
+    displayType
   );
   mainBuffer.push(metadataString);
   /* Metadata end */
@@ -553,8 +535,8 @@ const songObjectToHtmlTable = (songObject, bypassMeta = false) => {
   songObject.sections.forEach((section) => {
     const sectionString =
       displayType === DISPLAY_LYRICS
-        ? sectionObjectToLyrics(section, songObject.getDisplayType())
-        : sectionObjectToHtmlTable(section, songObject.getDisplayType());
+        ? sectionObjectToLyrics(section, displayType)
+        : sectionObjectToHtmlTable(section, displayType);
     if (sectionString) {
       sectionsBuffer.push(sectionString);
     }
@@ -571,11 +553,7 @@ const songObjectToHtmlTable = (songObject, bypassMeta = false) => {
  * @param {modsong} songObject
  * @param {boolean} bypassMeta
  */
-const songObjectToChordPro = (
-  songObject,
-  originalString = true,
-  bypassMeta = false
-) => {
+const songObjectToChordPro = (songObject, originalString = true, bypassMeta = false) => {
   /* Return null if song object is not initialized */
   if (!songObject.initialized) {
     console.error('Failed to display song. Song object is not initialized.');
@@ -586,10 +564,7 @@ const songObjectToChordPro = (
 
   if (!bypassMeta) {
     /* Metadata start */
-    const metadataString = metadataObjectToChordPro(
-      songObject.metadata,
-      songObject.transposeLogic
-    );
+    const metadataString = metadataObjectToChordPro(songObject.metadata, songObject.transposeLogic);
     mainBuffer.push(metadataString);
     /* Metadata end */
   }

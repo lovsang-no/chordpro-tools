@@ -42,12 +42,7 @@ const assertEqual = (expected, actual, input = '') => {
     );
 };
 
-const assertEqualLineByLine = (
-  expected,
-  actual,
-  input = '',
-  lineBreak = '\n'
-) => {
+const assertEqualLineByLine = (expected, actual, input = '', lineBreak = '\n') => {
   const actualList = actual.split(lineBreak);
   if (expected.split(lineBreak).length !== actualList.length) {
     throw new EvalError(
@@ -66,10 +61,7 @@ const assertEqualLineByLine = (
 
 const testChordTranspose = (chordToTranspose, expectedResult, input = '') => {
   chordToTranspose = new Chord(chordToTranspose, song.logicWrapper);
-  assertEqual(
-    expectedResult,
-    chordObjectToString(transposeChordObject(chordToTranspose), input)
-  );
+  assertEqual(expectedResult, chordObjectToString(transposeChordObject(chordToTranspose), input));
 };
 
 const setKey = (key) => {
@@ -118,9 +110,7 @@ const correctTranspose = {
 const testTransposingOfAllChordsInKey = (key, transpose = 0) => {
   beforeEach('testTransposingOfAllChordsInKey(key: ' + key + ')');
   const minor = key.endsWith('m');
-  const chordList = minor
-    ? correctTranspose.minor[key]
-    : correctTranspose.major[key];
+  const chordList = minor ? correctTranspose.minor[key] : correctTranspose.major[key];
 
   setKey(key);
   setTranspose(transpose);
@@ -132,17 +122,11 @@ const testTransposingOfAllChordsInKey = (key, transpose = 0) => {
       : correctTranspose.major[transposedKey];
   } catch (e) {
     throw new Error(
-      'Test fails in testTransposingOfAllChordsInKey(' +
-        key +
-        ') - cant get list for new key'
+      'Test fails in testTransposingOfAllChordsInKey(' + key + ') - cant get list for new key'
     );
   }
   chordList.forEach((chord, index) => {
-    testChordTranspose(
-      chord,
-      assertChordList[index],
-      chord + ', ' + transpose + ', key: ' + key
-    );
+    testChordTranspose(chord, assertChordList[index], chord + ', ' + transpose + ', key: ' + key);
   });
 };
 
@@ -226,16 +210,9 @@ const testTransposingOfComplexChords = () => {
         assertEqual(
           transposing.correctTransposedChord,
           chordObjectToString(
-            transposeChordObject(
-              new Chord(test.chord, song.logicWrapper),
-              logState
-            )
+            transposeChordObject(new Chord(test.chord, song.logicWrapper), logState)
           ),
-          test.chord +
-            ', ' +
-            transposing.transpose +
-            ', key: ' +
-            complexChordTest.key
+          test.chord + ', ' + transposing.transpose + ', key: ' + complexChordTest.key
         );
       });
     });
