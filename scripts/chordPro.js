@@ -9,17 +9,7 @@ String.prototype.wrapChord = function () {
 };
 
 String.prototype.wrapHTML = function (DOMElement, elClass = '') {
-  return (
-    '<' +
-    DOMElement +
-    ' class="' +
-    elClass +
-    '">' +
-    this +
-    '</' +
-    DOMElement +
-    '>'
-  );
+  return '<' + DOMElement + ' class="' + elClass + '">' + this + '</' + DOMElement + '>';
 };
 
 String.prototype.unwrapChord = function () {
@@ -42,40 +32,6 @@ const isCPOneLiner = (line) => {
   }
   return true;
 };
-
-const all_keys = [
-  'C',
-  'C#',
-  'Db',
-  'D',
-  'Eb',
-  'E',
-  'F',
-  'F#',
-  'Gb',
-  'G',
-  'Ab',
-  'A',
-  'Bb',
-  'B',
-  'Cb',
-  // Minor
-  'Cm',
-  'C#m',
-  'Dm',
-  'D#m',
-  'Ebm',
-  'Em',
-  'Fm',
-  'F#m',
-  'Gm',
-  'G#m',
-  'Abm',
-  'Am',
-  'A#m',
-  'Bbm',
-  'Bm',
-];
 
 const all_chords = [
   'A',
@@ -239,8 +195,7 @@ class Song {
           if (!line.trim().startsWith('[')) pairs[0]['chord'] = null;
           const pushIfNeeded = () => {
             let last = pairs[pairs.length - 1];
-            if (last['chord'] !== undefined && last['lyrics'] !== undefined)
-              pairs.push({});
+            if (last['chord'] !== undefined && last['lyrics'] !== undefined) pairs.push({});
           };
           lineList.forEach((word, index) => {
             pushIfNeeded();
@@ -268,8 +223,7 @@ class Song {
               let text = matches[2];
               if (command.toUpperCase() == 'KEY') text = text;
               //transpose_chord(text, transpose, transposed_is_b); // TODO: Transpose in correct way
-              else if (command.toUpperCase() == 'TEMPO')
-                text = text.split(' ')[0];
+              else if (command.toUpperCase() == 'TEMPO') text = text.split(' ')[0];
               //add more non-wrapping commands with this switch
               switch (command) {
                 case 'Key':
@@ -307,8 +261,7 @@ class Song {
           } /* For everything else  */ else {
             let LINETYPE;
             if (!meta_section_passed && linenum === 0) LINETYPE = 'SONG_TITLE';
-            else if (!meta_section_passed && linenum === 1)
-              LINETYPE = 'SONG_ARTIST';
+            else if (!meta_section_passed && linenum === 1) LINETYPE = 'SONG_ARTIST';
             else if (line.trim().endsWith(':')) LINETYPE = 'SECTION_START';
             else if (line.trim() === '' && !meta_section_passed) {
               LINETYPE = 'META_END';
@@ -387,22 +340,16 @@ class Song {
       if (this.metadata.artist)
         metaBuffer.push(this.metadata.artist.wrapHTML('div', 'cp-song-artist'));
       if (this.logicWrapper.currentKey)
-        metaBuffer.push(
-          ('Toneart: ' + this.logicWrapper.currentKey).wrapHTML('div')
-        );
+        metaBuffer.push(('Toneart: ' + this.logicWrapper.currentKey).wrapHTML('div'));
       if (this.metadata.tempo)
         metaBuffer.push(
-          (this.metadata.tempo + ' BPM ' + (this.metadata.time ?? '')).wrapHTML(
-            'div'
-          )
+          (this.metadata.tempo + ' BPM ' + (this.metadata.time ?? '')).wrapHTML('div')
         );
       for (let [key, value] of this.metadata.extra) {
         metaBuffer.push((key + ': ' + value).wrapHTML('div'));
       }
 
-      mainBuffer.push(
-        metaBuffer.join('\n').wrapHTML('div', 'cp-meta-wrapper') + br
-      );
+      mainBuffer.push(metaBuffer.join('\n').wrapHTML('div', 'cp-meta-wrapper') + br);
       /* End meta data */
 
       /* Add sections */
@@ -433,10 +380,8 @@ class Song {
         const metaBuffer = [];
         if (this.metadata.title) metaBuffer.push(this.metadata.title);
         if (this.metadata.artist) metaBuffer.push(this.metadata.artist);
-        if (this.logicWrapper.getKey())
-          metaBuffer.push('Key: ' + this.logicWrapper.getKey());
-        if (this.metadata.tempo)
-          metaBuffer.push('Tempo: ' + this.metadata.tempo);
+        if (this.logicWrapper.getKey()) metaBuffer.push('Key: ' + this.logicWrapper.getKey());
+        if (this.metadata.tempo) metaBuffer.push('Tempo: ' + this.metadata.tempo);
         if (this.metadata.time) metaBuffer.push('Time: ' + this.metadata.time);
         for (let [key, value] of this.metadata.extra) {
           metaBuffer.push(key + ': ' + value);
@@ -456,9 +401,7 @@ class Song {
               case 'ONELINE':
                 lineBuffer = [];
                 line.oneLine.forEach((oneLineObject) => {
-                  lineBuffer.push(
-                    '[' + chordObjectToTransposedString(oneLineObject) + ']'
-                  );
+                  lineBuffer.push('[' + chordObjectToTransposedString(oneLineObject) + ']');
                 });
                 mainBuffer.push(lineBuffer.join(' '));
                 break;
@@ -468,9 +411,7 @@ class Song {
               case 'LYRICS_AND_CHORDS':
                 lineBuffer = [];
                 line.pairs.forEach((pair) => {
-                  lineBuffer.push(
-                    '[' + chordObjectToTransposedString(pair.chord) + ']'
-                  );
+                  lineBuffer.push('[' + chordObjectToTransposedString(pair.chord) + ']');
                   if (pair.lyrics) lineBuffer.push(pair.lyrics);
                 });
                 mainBuffer.push(lineBuffer.join(''));
@@ -523,8 +464,7 @@ class Section {
   parse(parseTable) {
     const br = '<br>';
     let sectionBuffer = [];
-    if (this.title)
-      sectionBuffer.push(this.title.wrapHTML('div', 'cp-heading'));
+    if (this.title) sectionBuffer.push(this.title.wrapHTML('div', 'cp-heading'));
     this.lines.forEach((line) => {
       sectionBuffer.push(line.parse(parseTable));
     });
@@ -564,10 +504,7 @@ class SongLine {
         let oneLineBuffer = [];
         this.oneLine.forEach((chordObject) => {
           // WARN
-          let e = chordObjectToTransposedString(chordObject).wrapHTML(
-            'span',
-            'cp-chord'
-          );
+          let e = chordObjectToTransposedString(chordObject).wrapHTML('span', 'cp-chord');
           oneLineBuffer.push(e);
         });
         lineBuffer.push(oneLineBuffer.join(' ').wrapHTML('div'));
@@ -600,11 +537,7 @@ class SongLine {
               tableBuffer.push('</td>');
             }
             lineBuffer.push(
-              tableBuffer
-                .join('\n')
-                .wrapHTML('tr')
-                .wrapHTML('tbody')
-                .wrapHTML('table')
+              tableBuffer.join('\n').wrapHTML('tr').wrapHTML('tbody').wrapHTML('table')
             );
           } else {
             for (let i = 0; i < pairs.length; i++) {
@@ -614,8 +547,7 @@ class SongLine {
               chordLine += chord ? chord.parse() : '';
               lyricsLine += lyrics ?? '';
               let diff = (lyrics?.length ?? 0) - (chord?.length ?? 0);
-              if (i + 1 !== length && diff > 0)
-                chordLine += spaces(diff, '&nbsp');
+              if (i + 1 !== length && diff > 0) chordLine += spaces(diff, '&nbsp');
             }
             lineBuffer.push(chordLine + br);
             lineBuffer.push(lyricsLine + br);
@@ -661,12 +593,8 @@ class Chord {
     const rootChordString = chordParts[0];
     const bassChordString = chordParts[1];
 
-    this.root = rootChordString
-      ? chordPartObjectFromString(rootChordString)
-      : null;
-    this.bass = bassChordString
-      ? chordPartObjectFromString(bassChordString)
-      : null;
+    this.root = rootChordString ? chordPartObjectFromString(rootChordString) : null;
+    this.bass = bassChordString ? chordPartObjectFromString(bassChordString) : null;
   }
 
   transposedChord() {
@@ -729,10 +657,7 @@ class TransposeLogic {
     const originalIndex = this.keys.map((x) => x.key).indexOf(this.key); // TODO: Kan mulig erstattes siden vi allerede har akkorden
     if (originalIndex === -1) return null;
     let indexShift = this.transposeStep + originalIndex;
-    indexShift = modifiedModulo(
-      this.transposeStep + originalIndex,
-      this.keys.length
-    );
+    indexShift = modifiedModulo(this.transposeStep + originalIndex, this.keys.length);
     const transposedKeyObject = this.keys[indexShift];
     this.currentKeyObject = transposedKeyObject;
   }

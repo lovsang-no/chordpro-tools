@@ -1,3 +1,48 @@
+const validKeys = [
+  'C',
+  'C#',
+  'Db',
+  'D',
+  'D#',
+  'Eb',
+  'E',
+  'E#',
+  'Fb',
+  'F',
+  'F#',
+  'Gb',
+  'G',
+  'G#',
+  'Ab',
+  'A',
+  'A#',
+  'Bb',
+  'B',
+  'B#',
+  'Cb',
+  'Cm',
+  'C#m',
+  'Dbm',
+  'Dm',
+  'D#m',
+  'Ebm',
+  'Em',
+  'E#m',
+  'Fbm',
+  'Fm',
+  'F#m',
+  'Gbm',
+  'Gm',
+  'G#m',
+  'Abm',
+  'Am',
+  'A#m',
+  'Bbm',
+  'Bm',
+  'B#m',
+  'Cbm',
+];
+
 const getHelperStyles = () => {
   const styles = `
   .cp-meta-wrapper,
@@ -54,9 +99,8 @@ const getHelperStyles = () => {
   return styleElement;
 };
 
-
 const FeedbackForm = () => {
-  const e = newElement('div')
+  const e = newElement('div');
 
   e.innerHTML = `
     <form name="contact" method="POST" data-netlify-recaptcha="true" data-netlify="true">
@@ -72,7 +116,8 @@ const FeedbackForm = () => {
         <button type="submit">Send</button>
       </p>
     </form>`;
-  return e}
+  return e;
+};
 
 /**
  * Method for saving a .txt file.
@@ -145,22 +190,7 @@ const generateHelperStyleSheetSwitch = () => {
   };
 };
 
-const adjustKey = (input) => {
-  /* switch (input.innerText) {
-    case 'A#':
-      input.innerText = 'Bb';
-      break;
-    case 'D#':
-      input.innerText = 'Eb';
-      break;
-    case 'E#':
-      input.innerText = 'F';
-      break;
-    case 'G#':
-      input.innerText = 'G#';
-      break;
-  } */
-};
+const adjustKey = (input) => {};
 
 const generateChordProSectionObject = () => {
   const section = newElement('SECTION');
@@ -392,6 +422,7 @@ const generateChordProSectionObject = () => {
 
   const rerenderTarget = () => {
     song = newSongObjectFromTemplate(sheetToCp(generatedTemplate));
+    //song.displayNashville(true);
     //filename = song.generateFileName();
     renderCallback();
   };
@@ -423,11 +454,7 @@ const generateChordProSectionObject = () => {
       e.isShort ? 'short' : ''
     );
     inputWrapper.appendChild(input);
-    const span = newElement(
-      'DIV',
-      'textarea-span',
-      e.isMultiline ? 'multiline' : ''
-    );
+    const span = newElement('DIV', 'textarea-span', e.isMultiline ? 'multiline' : '');
     const updateInputFromSpan = (clear) => {
       input.value = clear ? '' : span.innerText.trim();
     };
@@ -447,22 +474,16 @@ const generateChordProSectionObject = () => {
         span.oninput = () => {
           adjustKey(span);
           updateInputFromSpan(true);
-          if (all_keys.indexOf(span.innerText) !== -1) {
+          if (validKeys.indexOf(span.innerText) !== -1) {
             span.classList.remove('error');
-            if (
-              !metaDataInputs[0].input.value.trim() ||
-              !metaDataInputs[1].input.value.trim()
-            ) {
+            if (!metaDataInputs[0].input.value.trim() || !metaDataInputs[1].input.value.trim()) {
               span.classList.add('error');
               span.innerText = lang.errors.noTitleOrArtistError;
             } else {
               updateInputFromSpan();
             }
           } else {
-            if (
-              !metaDataInputs[0].input.value.trim() ||
-              !metaDataInputs[1].input.value.trim()
-            ) {
+            if (!metaDataInputs[0].input.value.trim() || !metaDataInputs[1].input.value.trim()) {
               updateInputFromSpan(true);
               span.innerText = lang.errors.noTitleOrArtistError;
             }
@@ -507,8 +528,7 @@ const generateChordProSectionObject = () => {
   fileDownloadButton.autocapitalize = 'off';
   fileDownloadButton.spellcheck = 'false';
   fileDownloadButton.onclick = () => {
-    if (everythingIsFilledOut())
-      saveTextAsFile(sheetToCp(generatedTemplate), filename);
+    if (everythingIsFilledOut()) saveTextAsFile(sheetToCp(generatedTemplate), filename);
   };
 
   const saveUserData = () => {
@@ -554,8 +574,7 @@ const generateChordProSectionObject = () => {
 
   const rerenderAfterTranspose = () => {
     renderCallback();
-    if (metaDataInputs[5].span?.innerHTML)
-      metaDataInputs[5].span.innerHTML = currentKeyString();
+    if (metaDataInputs[5].span?.innerHTML) metaDataInputs[5].span.innerHTML = currentKeyString();
   };
   const setValueToLabelAndInputIndex = (index, text) => {
     const obj = metaDataInputs[index];
@@ -616,9 +635,7 @@ const generateLayout = (target) => {
   const howTo = newElement('DIV', 'how-to');
   headerGrid.appendChild(howTo);
   howTo.innerHTML += `<h2>${lang.howTo.title}</h2>`;
-  howTo.innerHTML += `<ol>${lang.howTo.list
-    .map((li) => `<li>${li}</li>`)
-    .join('\n')}</ol>`;
+  howTo.innerHTML += `<ol>${lang.howTo.list.map((li) => `<li>${li}</li>`).join('\n')}</ol>`;
   howTo.innerHTML += `<p>${lang.howTo.contactUsIfNeeded}</p>`;
   const howToButtonsWrapper = newElement('DIV', 'how-to-buttons-wrapper');
   const transposeWrapper = newElement('DIV', 'transpose-wrapper');
