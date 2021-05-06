@@ -268,7 +268,7 @@ const generateChordProSectionObject = () => {
     },
     {
       name: 'album',
-      placeholder: 'La stå tom hvis det er en singel',
+      placeholder: 'La stå tom hvis utgivelsen er en singel',
       labelText: 'Album*',
       cpKey: 'Album',
       required: false,
@@ -547,6 +547,7 @@ const generateChordProSectionObject = () => {
       }
     });
     updateTemplate();
+    boxInputWrapper.classList.add('input-block');
     fireInputChange();
   };
 
@@ -559,6 +560,7 @@ const generateChordProSectionObject = () => {
   };
 
   const backToUserData = () => {
+    boxInputWrapper.classList.remove('input-block');
     userContent.forEach((content, i) => {
       let e = metaDataInputs[i];
       if (e) {
