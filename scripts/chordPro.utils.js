@@ -9,8 +9,8 @@ const noteObjectList = [
       minor: { sharp: '1', flat: '1' },
     },
     solfege: {
-      major: { sharp: 'Do', flat: 'Do' },
-      minor: { sharp: 'La', flat: 'La' },
+      major: { sharp: 'DO', flat: 'DO' },
+      minor: { sharp: 'LA', flat: 'LA' },
     },
   },
   {
@@ -23,8 +23,8 @@ const noteObjectList = [
       minor: { sharp: '1#', flat: '2b' },
     },
     solfege: {
-      major: { sharp: 'Di', flat: 'Ra' },
-      minor: { sharp: 'Li', flat: 'Te' },
+      major: { sharp: 'DI', flat: 'RA' },
+      minor: { sharp: 'LI', flat: 'TE' },
     },
   },
   {
@@ -37,8 +37,8 @@ const noteObjectList = [
       minor: { sharp: '2', flat: '2' },
     },
     solfege: {
-      major: { sharp: 'Re', flat: 'Re' },
-      minor: { sharp: 'Ti', flat: 'Ti' },
+      major: { sharp: 'RE', flat: 'RE' },
+      minor: { sharp: 'TI', flat: 'TI' },
     },
   },
   {
@@ -51,8 +51,8 @@ const noteObjectList = [
       minor: { sharp: '3', flat: '3' },
     },
     solfege: {
-      major: { sharp: 'Ri', flat: 'Me' },
-      minor: { sharp: 'Do', flat: 'Do' },
+      major: { sharp: 'RI', flat: 'ME' },
+      minor: { sharp: 'DO', flat: 'DO' },
     },
   },
   {
@@ -65,8 +65,8 @@ const noteObjectList = [
       minor: { sharp: '3#', flat: '4b' },
     },
     solfege: {
-      major: { sharp: 'Mi', flat: 'Mi' },
-      minor: { sharp: 'Di', flat: 'Ra' },
+      major: { sharp: 'MI', flat: 'MI' },
+      minor: { sharp: 'DI', flat: 'RA' },
     },
   },
   {
@@ -79,8 +79,8 @@ const noteObjectList = [
       minor: { sharp: '4', flat: '4' },
     },
     solfege: {
-      major: { sharp: 'Fa', flat: 'Fa' },
-      minor: { sharp: 'Re', flat: 'Re' },
+      major: { sharp: 'FA', flat: 'FA' },
+      minor: { sharp: 'RE', flat: 'RE' },
     },
   },
   {
@@ -93,8 +93,8 @@ const noteObjectList = [
       minor: { sharp: '4#', flat: '5b' },
     },
     solfege: {
-      major: { sharp: 'Fi', flat: 'Se' },
-      minor: { sharp: 'Ri', flat: 'Me' },
+      major: { sharp: 'FI', flat: 'SE' },
+      minor: { sharp: 'RI', flat: 'ME' },
     },
   },
   {
@@ -107,8 +107,8 @@ const noteObjectList = [
       minor: { sharp: '5', flat: '5' },
     },
     solfege: {
-      major: { sharp: 'Sol', flat: 'Sol' },
-      minor: { sharp: 'Mi', flat: 'Mi' },
+      major: { sharp: 'SOL', flat: 'SOL' },
+      minor: { sharp: 'MI', flat: 'MI' },
     },
   },
   {
@@ -121,8 +121,8 @@ const noteObjectList = [
       minor: { sharp: '6', flat: '6' },
     },
     solfege: {
-      major: { sharp: 'Si', flat: 'Le' },
-      minor: { sharp: 'Fa', flat: 'Fa' },
+      major: { sharp: 'SI', flat: 'LE' },
+      minor: { sharp: 'FA', flat: 'FA' },
     },
   },
   {
@@ -135,8 +135,8 @@ const noteObjectList = [
       minor: { sharp: '6#', flat: '7b' },
     },
     solfege: {
-      major: { sharp: 'La', flat: 'La' },
-      minor: { sharp: 'Fi', flat: 'Se' },
+      major: { sharp: 'LA', flat: 'LA' },
+      minor: { sharp: 'FI', flat: 'SE' },
     },
   },
   {
@@ -149,8 +149,8 @@ const noteObjectList = [
       minor: { sharp: '7', flat: '7' },
     },
     solfege: {
-      major: { sharp: 'Li', flat: 'Te' },
-      minor: { sharp: 'Sol', flat: 'Sol' },
+      major: { sharp: 'LI', flat: 'TE' },
+      minor: { sharp: 'SOL', flat: 'SOL' },
     },
   },
   {
@@ -163,8 +163,8 @@ const noteObjectList = [
       minor: { sharp: '7b', flat: '1b' },
     },
     solfege: {
-      major: { sharp: 'Ti', flat: 'Ti' },
-      minor: { sharp: 'Si', flat: 'Le' },
+      major: { sharp: 'TI', flat: 'TI' },
+      minor: { sharp: 'SI', flat: 'LE' },
     },
   },
 ];
