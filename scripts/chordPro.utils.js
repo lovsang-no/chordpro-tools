@@ -245,13 +245,15 @@ const newChordObjectFromString = (chordString, transposeLogic) => {
 const transposeChordObject = (chordObject) => {
   const transposeLogic = chordObject.transposeLogic;
   const transposeStep = transposeLogic.transposeStep;
-  if (!transposeStep) return chordObject;
+  const capoStep = transposeLogic.capoStep;
+
+  if (!(transposeStep || capoStep)) return chordObject;
 
   const originalKey = transposeLogic.originalKeyObject;
   const currentKey = transposeLogic.currentKeyObject;
 
   const transposeLength = modifiedModulo(
-    currentKey.index - originalKey.index,
+    currentKey.index - originalKey.index - capoStep,
     noteObjectList.length
   );
 
@@ -299,7 +301,9 @@ const transposeNoteObject = (originalNoteObject, transposeLength) => {
  * @returns {string} Chord as string
  */
 const chordObjectToString = (chordObject) => {
-  if (!chordObject.transposeLogic?.transposeStep) return chordObject.originalString;
+  const transposeLogic = chordObject.transposeLogic;
+
+  if (!(transposeLogic.transposeStep || transposeLogic.capoStep)) return chordObject.originalString;
   let resultString = '';
 
   const root = chordObject.root;
@@ -307,8 +311,8 @@ const chordObjectToString = (chordObject) => {
   const bass = chordObject.bass;
   const bassNoteObject = bass?.noteObject;
 
-  let useFlat = chordObject.transposeLogic.currentKeyObject.flats !== undefined;
-  const keyObject = chordObject.transposeLogic.currentKeyObject;
+  let useFlat = transposeLogic.currentKeyObject.flats !== undefined;
+  const keyObject = transposeLogic.currentKeyObject;
   const keySharps = keyObject.sharps;
   const keyFlats = keyObject.flats;
 
