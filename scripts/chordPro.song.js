@@ -39,6 +39,7 @@ const newSongObjectFromTemplate = (template, bypassMeta = false) => {
   const sections = [];
   const transposeLogic = {
     transposeStep: 0,
+    capoStep: 0,
     keyIsMinor: undefined,
     key: undefined,
     keys: undefined,
@@ -80,6 +81,13 @@ const newSongObjectFromTemplate = (template, bypassMeta = false) => {
       transposeLogic.currentKeyObject = transposeLogic.originalKeyObject;
       transposeLogic.updateCurrentKeyObject();
     },
+
+    // TODO
+    getDisplayKey: () => {
+      if (!transposeLogic.capoStep) return transposeLogic.currentKeyObject.key;
+    },
+    getDisplayCapo: () => {},
+
     transposeTo: (to = 0) => {
       transposeLogic.transposeStep = to;
       transposeLogic.updateCurrentKeyObject();
@@ -98,6 +106,18 @@ const newSongObjectFromTemplate = (template, bypassMeta = false) => {
           ? by - transposeLogic.keys.length
           : by;
       transposeLogic.updateCurrentKeyObject();
+    },
+    capoTo: (to = 0) => {
+      transposeLogic.capoStep = to;
+    },
+    capoReset: () => transposeLogic.capoTo(0),
+    capoUp: (by = 1) => {
+      transposeLogic.capoStep += by;
+      if (transposeLogic.capoStep > 11) transposeLogic.capoStep = 11;
+    },
+    capoDown: (by = 1) => {
+      transposeLogic.capoStep -= by;
+      if (transposeLogic.capoStep < 0) transposeLogic.capoReset();
     },
   };
   const metadata = {
@@ -130,6 +150,20 @@ const newSongObjectFromTemplate = (template, bypassMeta = false) => {
   };
   const transposeDown = (by = 1) => {
     transposeLogic.transposeDown(by);
+    renderCallback();
+  };
+
+  const capoTo = (to = 0) => {
+    transposeLogic.capoTo(to);
+    renderCallback();
+  };
+  const capoReset = () => capoTo(0);
+  const capoUp = (by = 1) => {
+    transposeLogic.capoUp(by);
+    renderCallback();
+  };
+  const capoDown = (by = 1) => {
+    transposeLogic.capoDown(by);
     renderCallback();
   };
 
@@ -298,6 +332,9 @@ const newSongObjectFromTemplate = (template, bypassMeta = false) => {
     transposeUp,
     transposeReset,
     transposeDown,
+    capoReset,
+    capoUp,
+    capoDown,
     displayChords,
     displayLyrics,
     displayNashville,
@@ -472,6 +509,8 @@ const metadataObjectToHtml = (metadata, transposeLogic, displayType) => {
       metaBuffer.push(
         ('Original toneart: ' + transposeLogic.originalKeyObject.key).wrapHTML('div')
       );
+    if (transposeLogic.capoStep)
+      metaBuffer.push(('Capo: ' + transposeLogic.capoStep).wrapHTML('div'));
   }
   if (metadata.tempo)
     metaBuffer.push((metadata.tempo + ' BPM ' + (metadata.time ?? '')).wrapHTML('div'));
