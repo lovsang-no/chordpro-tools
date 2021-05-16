@@ -4,6 +4,7 @@ const songWrapper = document.createElement('DIV');
 
 const callback = () => {
   songWrapper.innerHTML = songObjectToHtmlTable(song);
+  console.log(song);
 };
 
 song.setRenderCallback(callback);
@@ -17,4 +18,7 @@ target.innerHTML += `Transponer<br>`;
 target.innerHTML += `<button onclick="song.transposeUp()">+</button>`;
 target.innerHTML += `<button onclick="song.transposeDown()">-</button>`;
 target.innerHTML += `<button onclick="song.transposeReset()">Reset</button>`;
+target.innerHTML += `<br><br>`;
+target.innerHTML += `<button onclick="song.setDisplayH(true)">Bruk H</button>`;
+target.innerHTML += `<button onclick="song.setDisplayH(false)">Bruk B</button>`;
 target.appendChild(songWrapper);

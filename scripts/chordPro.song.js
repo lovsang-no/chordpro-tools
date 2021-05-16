@@ -42,6 +42,7 @@ const newSongObjectFromTemplate = (template, bypassMeta = false) => {
   const displayType = { type: DISPLAY_CHORDS, nashvilleUseFlat: true };
   const sections = [];
   const transposeLogic = {
+    useH: true,
     transposeStep: 0,
     capoStep: 0,
     keyIsMinor: undefined,
@@ -157,6 +158,10 @@ const newSongObjectFromTemplate = (template, bypassMeta = false) => {
       if (transposeLogic.capoStep < 0) transposeLogic.capoStep = 0;
       transposeLogic.updateCurrentKeyObject();
     },
+
+    setDisplayH: (displayH) => {
+      transposeLogic.useH = displayH;
+    },
   };
   const metadata = {
     title: undefined,
@@ -220,6 +225,10 @@ const newSongObjectFromTemplate = (template, bypassMeta = false) => {
   };
   const displaySolfege = () => {
     displayType.type = DISPLAY_SOLFEGE;
+    renderCallback();
+  };
+  const setDisplayH = (displayH) => {
+    transposeLogic.setDisplayH(displayH);
     renderCallback();
   };
 
@@ -377,6 +386,7 @@ const newSongObjectFromTemplate = (template, bypassMeta = false) => {
     displayLyrics,
     displayNashville,
     displaySolfege,
+    setDisplayH,
   };
 
   return song;
