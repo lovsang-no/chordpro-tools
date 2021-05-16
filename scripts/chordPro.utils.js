@@ -312,21 +312,19 @@ const chordObjectToString = (chordObject) => {
   const bassNoteObject = bass?.noteObject;
 
   let useFlat = transposeLogic.currentKeyObject.flats !== undefined;
+  const useH = transposeLogic.useH;
   const keyObject = transposeLogic.currentKeyObject;
   const keySharps = keyObject.sharps;
   const keyFlats = keyObject.flats;
 
   if (root) {
-    const rootNoteString = useFlat
-      ? rootNoteObject.flat[keyFlats]
-      : rootNoteObject.sharp[keySharps];
-
+    let rootNoteString = useFlat ? rootNoteObject.flat[keyFlats] : rootNoteObject.sharp[keySharps];
+    if (useH && rootNoteString.startsWith('B')) rootNoteString = 'H' + rootNoteString.substr(1);
     resultString += rootNoteString + root.quality;
   }
   if (bass) {
-    const bassNoteString = useFlat
-      ? bassNoteObject.flat[keyFlats]
-      : bassNoteObject.sharp[keySharps];
+    let bassNoteString = useFlat ? bassNoteObject.flat[keyFlats] : bassNoteObject.sharp[keySharps];
+    if (useH && bassNoteString.startsWith('B')) bassNoteString = 'H' + bassNoteString.substr(1);
     resultString += '/' + bassNoteString + bass.quality;
   }
 
