@@ -253,7 +253,7 @@ const transposeChordObject = (chordObject) => {
   const currentKey = transposeLogic.currentKeyObject;
 
   const transposeLength = modifiedModulo(
-    currentKey.index - originalKey.index - capoStep,
+    currentKey.index - originalKey.index,
     noteObjectList.length
   );
 

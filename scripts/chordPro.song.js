@@ -29,6 +29,10 @@ const newSongObjectFromTemplate = (template, bypassMeta = false) => {
   let initialized = false;
 
   let renderCallback = Function();
+
+  /**
+   * @param {Function} callback
+   */
   const setRenderCallback = (callback) => {
     renderCallback = callback;
     renderCallback();
@@ -62,7 +66,7 @@ const newSongObjectFromTemplate = (template, bypassMeta = false) => {
       const originalIndex = transposeLogic.originalKeyObject.listIndex;
       if (originalIndex === -1) throw new Error('Could not find key.');
       const newListIndex = modifiedModulo(
-        transposeLogic.transposeStep + originalIndex,
+        transposeLogic.transposeStep + originalIndex + transposeLogic.capoStep,
         transposeLogic.keys.length
       );
       const transposedKeyObject = transposeLogic.keys[newListIndex];
@@ -82,17 +86,44 @@ const newSongObjectFromTemplate = (template, bypassMeta = false) => {
       transposeLogic.updateCurrentKeyObject();
     },
 
-    // TODO
     getDisplayKey: () => {
       if (!transposeLogic.capoStep) return transposeLogic.currentKeyObject.key;
+
+      const originalIndex = transposeLogic.originalKeyObject.listIndex;
+      const newListIndex = modifiedModulo(
+        transposeLogic.transposeStep + originalIndex,
+        transposeLogic.keys.length
+      );
+      const transposedKeyObject = transposeLogic.keys[newListIndex];
+      return transposedKeyObject.key;
     },
-    getDisplayCapo: () => {},
+
+    getDisplayCapo: () => {
+      const originalKeyObject = transposeLogic.originalKeyObject;
+      const newListIndex = modifiedModulo(
+        originalKeyObject.listIndex + transposeLogic.capoStep,
+        transposeLogic.keys.length
+      );
+      const transposedKeyIndex = transposeLogic.keys[newListIndex]?.index;
+
+      actualCapoStep = modifiedModulo(transposedKeyIndex - originalKeyObject.index, 12);
+
+      console.log(
+        actualCapoStep,
+        originalKeyObject.index,
+        transposedKeyIndex,
+        transposeLogic.keys.length
+      );
+      return actualCapoStep;
+    },
 
     transposeTo: (to = 0) => {
       transposeLogic.transposeStep = to;
       transposeLogic.updateCurrentKeyObject();
     },
+
     transposeReset: () => transposeLogic.transposeTo(0),
+
     transposeUp: (by = 1) => {
       transposeLogic.transposeStep +=
         transposeLogic.transposeStep < transposeLogic.keys.length
@@ -100,6 +131,7 @@ const newSongObjectFromTemplate = (template, bypassMeta = false) => {
           : by - transposeLogic.keys.length;
       transposeLogic.updateCurrentKeyObject();
     },
+
     transposeDown: (by = 1) => {
       transposeLogic.transposeStep -=
         transposeLogic.transposeStep < -transposeLogic.keys.length
@@ -107,17 +139,23 @@ const newSongObjectFromTemplate = (template, bypassMeta = false) => {
           : by;
       transposeLogic.updateCurrentKeyObject();
     },
+
     capoTo: (to = 0) => {
       transposeLogic.capoStep = to;
+      transposeLogic.updateCurrentKeyObject();
     },
+
     capoReset: () => transposeLogic.capoTo(0),
+
     capoUp: (by = 1) => {
-      transposeLogic.capoStep += by;
-      if (transposeLogic.capoStep > 11) transposeLogic.capoStep = 11;
+      if (transposeLogic.capoStep < transposeLogic.keys.length - 1) transposeLogic.capoStep += by;
+      transposeLogic.updateCurrentKeyObject();
     },
+
     capoDown: (by = 1) => {
       transposeLogic.capoStep -= by;
-      if (transposeLogic.capoStep < 0) transposeLogic.capoReset();
+      if (transposeLogic.capoStep < 0) transposeLogic.capoStep = 0;
+      transposeLogic.updateCurrentKeyObject();
     },
   };
   const metadata = {
@@ -514,13 +552,13 @@ const metadataObjectToHtml = (metadata, transposeLogic, displayType) => {
   if (metadata.artist) metaBuffer.push(metadata.artist.wrapHTML('div', 'cp-song-artist'));
   if (!excludeKey) {
     if (!showOriginalKey && transposeLogic.currentKeyObject)
-      metaBuffer.push(('Toneart: ' + transposeLogic.currentKeyObject.key).wrapHTML('div'));
+      metaBuffer.push(('Toneart: ' + transposeLogic.getDisplayKey()).wrapHTML('div'));
     if (showOriginalKey && transposeLogic.originalKeyObject)
       metaBuffer.push(
         ('Original toneart: ' + transposeLogic.originalKeyObject.key).wrapHTML('div')
       );
     if (transposeLogic.capoStep)
-      metaBuffer.push(('Capo: ' + transposeLogic.capoStep).wrapHTML('div'));
+      metaBuffer.push(('Capo: ' + transposeLogic.getDisplayCapo()).wrapHTML('div'));
   }
   if (metadata.tempo)
     metaBuffer.push((metadata.tempo + ' BPM ' + (metadata.time ?? '')).wrapHTML('div'));
