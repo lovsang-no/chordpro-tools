@@ -566,7 +566,9 @@ const generateChordProSectionObject = () => {
   fileDownloadButton.autocapitalize = 'off';
   fileDownloadButton.spellcheck = 'false';
   fileDownloadButton.onclick = () => {
-    if (everythingIsFilledOut()) saveTextAsFile(sheetToCp(generatedTemplate), filename);
+    console.log(song);
+    console.log(songObjectToChordPro(song));
+    if (everythingIsFilledOut()) saveTextAsFile(songObjectToChordPro(song), filename);
   };
 
   const applyExampleInput = () => {
@@ -584,7 +586,6 @@ const generateChordProSectionObject = () => {
   };
 
   const applyDefaultInput = () => {
-    console.log(defaultObject);
     metaDataInputs.forEach((e, i) => {
       if (defaultObject[i] !== undefined) {
         e.span.innerText = defaultObject[i];

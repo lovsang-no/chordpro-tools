@@ -833,7 +833,7 @@ Tempo: 86 BPM
 Time: 4/4
 Heisann: Key
 
-[|] [D] [-] [-] [-] [|] [D/C#] [-] [-] [-] [|] [Bm7] [-] [-] [-] [|] [G] [-] [-] [-] [|]
+[|] [H] [-] [-] [-] [|] [D/C#] [-] [-] [-] [|] [Bm7] [-] [-] [-] [|] [G] [-] [-] [-] [|]
 
 Vers 1:
 D[D]u kom til m[D/C#]eg og jeg fikk s[G]e hvem du var
@@ -848,7 +848,7 @@ Og Jesus h[G]er står jeg ved ditt k[D]ors
 og hører du k[G]aller meg, k[F#sus]aller me[F#]g
 
 Refreng:
-Til å fø[Bm7]lge deg hvor e[G]nn du går
+Til å fø[Hm7]lge deg hvor e[G]nn du går
 Jesus [D]du ga meg alt å [Asus4]leve for[A]
 Da d[Bm7]u ble korsfestet ble je[G]g satt fri
 For [E]se jeg var død men har [Asus4]nå fått li[A]v
