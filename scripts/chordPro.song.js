@@ -436,7 +436,7 @@ const sectionObjectToLyrics = (section) => {
  * @param {object} section
  * @returns
  */
-const sectionObjectToChordPro = (section, originalString = true) => {
+const sectionObjectToChordPro = (section, originalString = true, translateHToB = true) => {
   const sectionBuffer = [];
   if (section.title) sectionBuffer.push(section.title);
 
@@ -452,6 +452,9 @@ const sectionObjectToChordPro = (section, originalString = true) => {
                 ? chordObjectToOriginalString(element.word)
                 : chordObjectToTransposedString(element.word)
               : element.word;
+
+          /* Translate H to B */
+          if (translateHToB && word.startsWith('H')) word = 'B' + word.substr(1);
           word = word.wrapChord();
           lineBuffer.push(word + ' ');
         });
@@ -461,13 +464,20 @@ const sectionObjectToChordPro = (section, originalString = true) => {
         for (const pair of line.pairs) {
           const chordObject = pair.chord;
           const lyrics = pair.lyrics;
-          const transposedChord = chordObject
+          let transposedChord = chordObject
             ? originalString
-              ? chordObjectToOriginalString(chordObject).wrapChord()
-              : chordObjectToTransposedString(chordObject).wrapChord()
+              ? chordObjectToOriginalString(chordObject)
+              : chordObjectToTransposedString(chordObject)
             : '';
+          /* Translate H to B */
+          console.log(transposedChord);
+          if (translateHToB && transposedChord.startsWith('H')) {
+            console.log(transposedChord);
+            transposedChord = 'B' + transposedChord.substr(1);
+            console.log(transposedChord);
+          }
           const lyricsString = lyrics ? lyrics : '';
-          lyricsAndBracketedChords = transposedChord + lyricsString;
+          let lyricsAndBracketedChords = transposedChord.wrapChord() + lyricsString;
 
           lineBuffer.push(lyricsAndBracketedChords);
         }
@@ -592,7 +602,12 @@ const songObjectToHtmlTable = (songObject, bypassMeta = false) => {
  * @param {modsong} songObject
  * @param {boolean} bypassMeta
  */
-const songObjectToChordPro = (songObject, originalString = true, bypassMeta = false) => {
+const songObjectToChordPro = (
+  songObject,
+  originalString = true,
+  bypassMeta = false,
+  translateHToB = true
+) => {
   /* Return null if song object is not initialized */
   if (!songObject.initialized) {
     console.error('Failed to display song. Song object is not initialized.');
@@ -611,7 +626,7 @@ const songObjectToChordPro = (songObject, originalString = true, bypassMeta = fa
   /* Sections start */
   const sectionsBuffer = [];
   songObject.sections.forEach((section) => {
-    const sectionString = sectionObjectToChordPro(section, originalString);
+    const sectionString = sectionObjectToChordPro(section, originalString, translateHToB);
     if (sectionString) {
       sectionsBuffer.push(sectionString);
     }
