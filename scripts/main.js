@@ -42,6 +42,36 @@ const validKeys = [
   'B#m',
   'Cbm',
 ];
+const displayCopyrightPart = (songObject) => {
+  const copyrightBuffer = [];
+
+  if (songObject.metadata.published && songObject.metadata.copyright) {
+    copyrightBuffer.push(
+      lang.copyright.main
+        .replaceAll(PUBLISH_YEAR, songObject.metadata.published)
+        .replaceAll(COPYRIGHT, songObject.metadata.copyright)
+        .replaceAll(SONG_TITLE, songObject.metadata.title)
+        .replaceAll(
+          ARTIST_NAME,
+          songObject.metadata.artist.trim().endsWith('s')
+            ? songObject.metadata.artist.trim()
+            : songObject.metadata.artist.trim() + 's'
+        )
+        .replaceAll(
+          ALBUM_NAME,
+          songObject.metadata.album ? songObject.metadata.album : songObject.metadata.title
+        )
+        .replaceAll(ALBUM, songObject.metadata.album ? ALBUM : 'singel')
+        .replaceAll('\n', '</br>')
+    );
+  }
+  if (songObject.metadata.web) {
+    copyrightBuffer.push('</br>');
+    copyrightBuffer.push(lang.copyright.moreInfo.replaceAll(WEB_PAGE, songObject.metadata.web));
+  }
+
+  return copyrightBuffer.join('\n').wrapHTML('DIV', 'cp-copyright-wrapper');
+};
 
 const getHelperStyles = () => {
   const styles = `
@@ -419,6 +449,7 @@ const generateChordProSectionObject = () => {
 
   const renderCallback = () => {
     chordProTarget.innerHTML = songObjectToHtmlTable(song) ?? '';
+    chordProTarget.innerHTML += displayCopyrightPart(song) ?? '';
   };
 
   const rerenderTarget = () => {
@@ -568,7 +599,8 @@ const generateChordProSectionObject = () => {
   fileDownloadButton.onclick = () => {
     console.log(song);
     console.log(songObjectToChordPro(song));
-    if (everythingIsFilledOut()) saveTextAsFile(songObjectToChordPro(song), filename);
+    if (everythingIsFilledOut())
+      saveTextAsFile(sheetToCp(generatedTemplate) /* songObjectToChordPro(song) */, filename);
   };
 
   const applyExampleInput = () => {
