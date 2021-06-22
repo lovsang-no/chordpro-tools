@@ -100,18 +100,18 @@ const newSongObjectFromTemplate = (template, bypassMeta = false) => {
     },
 
     getDisplayCapo: () => {
-      const originalKeyObject = transposeLogic.originalKeyObject;
+      const currentKeyObject = transposeLogic.currentKeyObject;
       const newListIndex = modifiedModulo(
-        originalKeyObject.listIndex + transposeLogic.capoStep,
+        currentKeyObject.listIndex + transposeLogic.capoStep,
         transposeLogic.keys.length
       );
       const transposedKeyIndex = transposeLogic.keys[newListIndex]?.index;
 
-      actualCapoStep = modifiedModulo(transposedKeyIndex - originalKeyObject.index, 12);
+      actualCapoStep = modifiedModulo(transposedKeyIndex - currentKeyObject.index, 12);
 
       console.log(
         actualCapoStep,
-        originalKeyObject.index,
+        currentKeyObject.index,
         transposedKeyIndex,
         transposeLogic.keys.length
       );

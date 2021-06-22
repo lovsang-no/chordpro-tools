@@ -160,7 +160,7 @@ const noteObjectList = [
     flat: ['B', 'B', 'B', 'B', 'B', 'B', 'Cb', 'Cb'],
     nashville: {
       major: { sharp: '7', flat: '7' },
-      minor: { sharp: '7b', flat: '♭1' },
+      minor: { sharp: '♭7', flat: '♭1' },
     },
     solfege: {
       major: { sharp: 'TI', flat: 'TI' },
@@ -319,12 +319,14 @@ const chordObjectToString = (chordObject) => {
 
   if (root) {
     let rootNoteString = useFlat ? rootNoteObject.flat[keyFlats] : rootNoteObject.sharp[keySharps];
-    if (useH && rootNoteString.startsWith('B')) rootNoteString = 'H' + rootNoteString.substr(1);
+    if (useH && rootNoteString.startsWith('B') && !rootNoteString.startsWith('Bb'))
+      rootNoteString = 'H' + rootNoteString.substr(1);
     resultString += rootNoteString + root.quality;
   }
   if (bass) {
     let bassNoteString = useFlat ? bassNoteObject.flat[keyFlats] : bassNoteObject.sharp[keySharps];
-    if (useH && bassNoteString.startsWith('B')) bassNoteString = 'H' + bassNoteString.substr(1);
+    if (useH && bassNoteString.startsWith('B') && !rootNoteString.startsWith('Bb'))
+      bassNoteString = 'H' + bassNoteString.substr(1);
     resultString += '/' + bassNoteString + bass.quality;
   }
 
