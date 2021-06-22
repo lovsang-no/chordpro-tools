@@ -42,14 +42,52 @@ const validKeys = [
   'B#m',
   'Cbm',
 ];
+
+const getCopyrightObject = (songObject) => {
+  let album;
+  let published;
+  let web;
+  let copyright;
+
+  for (let [key, value] of songObject.metadata.extra.entries()) {
+    console.log(key, value);
+    switch ((key || '').toUpperCase()) {
+      case 'ALBUM':
+        album = value;
+        break;
+      case 'PUBLISHED':
+        published = value;
+        break;
+      case 'WEB':
+        web = value;
+        break;
+      case 'COPYRIGHT':
+        copyright = value;
+        break;
+    }
+  }
+
+  return {
+    album,
+    published,
+    web,
+    copyright,
+    complete: copyright && published && album,
+  };
+};
+
 const displayCopyrightPart = (songObject) => {
   const copyrightBuffer = [];
 
-  if (songObject.metadata.published && songObject.metadata.copyright) {
+  const copyrightObject = getCopyrightObject(songObject);
+
+  if (!copyrightObject.complete) return;
+
+  if (copyrightObject.published && copyrightObject.copyright) {
     copyrightBuffer.push(
       lang.copyright.main
-        .replaceAll(PUBLISH_YEAR, songObject.metadata.published)
-        .replaceAll(COPYRIGHT, songObject.metadata.copyright)
+        .replaceAll(PUBLISH_YEAR, copyrightObject.published)
+        .replaceAll(COPYRIGHT, copyrightObject.copyright)
         .replaceAll(SONG_TITLE, songObject.metadata.title)
         .replaceAll(
           ARTIST_NAME,
@@ -59,15 +97,15 @@ const displayCopyrightPart = (songObject) => {
         )
         .replaceAll(
           ALBUM_NAME,
-          songObject.metadata.album ? songObject.metadata.album : songObject.metadata.title
+          copyrightObject.album ? copyrightObject.album : songObject.metadata.title
         )
-        .replaceAll(ALBUM, songObject.metadata.album ? ALBUM : 'singel')
+        .replaceAll(ALBUM, copyrightObject.album ? ALBUM : 'singel')
         .replaceAll('\n', '</br>')
     );
   }
-  if (songObject.metadata.web) {
+  if (copyrightObject.web) {
     copyrightBuffer.push('</br>');
-    copyrightBuffer.push(lang.copyright.moreInfo.replaceAll(WEB_PAGE, songObject.metadata.web));
+    copyrightBuffer.push(lang.copyright.moreInfo.replaceAll(WEB_PAGE, copyrightObject.web));
   }
 
   return copyrightBuffer.join('\n').wrapHTML('DIV', 'cp-copyright-wrapper');
@@ -599,8 +637,7 @@ const generateChordProSectionObject = () => {
   fileDownloadButton.onclick = () => {
     console.log(song);
     console.log(songObjectToChordPro(song));
-    if (everythingIsFilledOut())
-      saveTextAsFile(sheetToCp(generatedTemplate) /* songObjectToChordPro(song) */, filename);
+    if (everythingIsFilledOut()) saveTextAsFile(songObjectToChordPro(song), filename);
   };
 
   const applyExampleInput = () => {

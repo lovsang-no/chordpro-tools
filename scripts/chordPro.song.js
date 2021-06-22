@@ -283,7 +283,7 @@ const newSongObjectFromTemplate = (template, bypassMeta = false) => {
         getCurrentSection().lines.push({ type, pairs });
       } /* Line is blank or not containing chords */ else {
         /* Metadata */
-        const metaRegex = /^(key|tempo|time|published|copyright|web|album):\s*(.*)/i;
+        const metaRegex = /^(key|tempo|time):\s*(.*)/i;
         if (!meta_section_passed && line.match(metaRegex)) {
           const matches = line.match(metaRegex, 'i');
 
@@ -305,18 +305,6 @@ const newSongObjectFromTemplate = (template, bypassMeta = false) => {
                 break;
               case 'TIME':
                 metadata.time = text;
-                break;
-              case 'PUBLISHED':
-                metadata.published = text;
-                break;
-              case 'WEB':
-                metadata.web = text;
-                break;
-              case 'COPYRIGHT':
-                metadata.copyright = text;
-                break;
-              case 'ALBUM':
-                metadata.album = text;
                 break;
             }
           }
@@ -525,7 +513,9 @@ const sectionObjectToChordPro = (section, originalString = true, translateHToB =
             console.log(transposedChord);
           }
           const lyricsString = lyrics ? lyrics : '';
-          let lyricsAndBracketedChords = transposedChord.wrapChord() + lyricsString;
+          console.log(transposedChord);
+          let lyricsAndBracketedChords =
+            (transposedChord ? transposedChord.wrapChord() : '') + lyricsString;
 
           lineBuffer.push(lyricsAndBracketedChords);
         }
