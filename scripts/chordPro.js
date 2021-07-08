@@ -832,6 +832,7 @@ Key: D
 Tempo: 86 BPM
 Time: 4/4
 Heisann: Key
+Copyright: Copyright text 
 
 [|] [H] [-] [-] [-] [|] [D/C#] [-] [-] [-] [|] [Bm7] [-] [-] [-] [|] [G] [-] [-] [-] [|]
 

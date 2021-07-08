@@ -576,7 +576,7 @@ const metadataObjectToHtml = (metadata, transposeLogic, displayType) => {
  * @param {*} transposeLogic
  * @returns
  */
-const metadataObjectToChordPro = (metadata, transposeLogic) => {
+const metadataObjectToChordPro = (metadata, transposeLogic, includeMetaKeys = undefined) => {
   /* Metadata start */
   const metaBuffer = [];
   if (metadata.title) metaBuffer.push(metadata.title);
@@ -586,7 +586,13 @@ const metadataObjectToChordPro = (metadata, transposeLogic) => {
   if (metadata.tempo) metaBuffer.push('Tempo: ' + metadata.tempo);
   if (metadata.time) metaBuffer.push('Time: ' + metadata.time);
   for (let [key, value] of metadata.extra) {
-    metaBuffer.push(key + ': ' + value);
+    if (includeMetaKeys) {
+      if (includeMetaKeys.indexOf(key.toUpperCase()) !== -1) {
+        metaBuffer.push(key + ': ' + value);
+      }
+    } else {
+      metaBuffer.push(key + ': ' + value);
+    }
   }
 
   return metaBuffer.join('\n') + '\n';
@@ -644,7 +650,8 @@ const songObjectToChordPro = (
   songObject,
   originalString = true,
   bypassMeta = false,
-  translateHToB = true
+  translateHToB = true,
+  includeMetaKeys = undefined
 ) => {
   /* Return null if song object is not initialized */
   if (!songObject.initialized) {
@@ -656,7 +663,11 @@ const songObjectToChordPro = (
 
   if (!bypassMeta) {
     /* Metadata start */
-    const metadataString = metadataObjectToChordPro(songObject.metadata, songObject.transposeLogic);
+    const metadataString = metadataObjectToChordPro(
+      songObject.metadata,
+      songObject.transposeLogic,
+      includeMetaKeys
+    );
     mainBuffer.push(metadataString);
     /* Metadata end */
   }

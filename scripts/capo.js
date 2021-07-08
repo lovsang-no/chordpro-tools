@@ -22,3 +22,5 @@ target.innerHTML += `<br><br>`;
 target.innerHTML += `<button onclick="song.setDisplayH(true)">Bruk H</button>`;
 target.innerHTML += `<button onclick="song.setDisplayH(false)">Bruk B</button>`;
 target.appendChild(songWrapper);
+
+console.log(song, songObjectToChordPro(song, false, false, true, ['COPYRIGHT']));
