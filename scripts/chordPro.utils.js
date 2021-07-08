@@ -325,7 +325,7 @@ const chordObjectToString = (chordObject) => {
   }
   if (bass) {
     let bassNoteString = useFlat ? bassNoteObject.flat[keyFlats] : bassNoteObject.sharp[keySharps];
-    if (useH && bassNoteString.startsWith('B') && !rootNoteString.startsWith('Bb'))
+    if (useH && bassNoteString.startsWith('B') && !bassNoteString.startsWith('Bb'))
       bassNoteString = 'H' + bassNoteString.substr(1);
     resultString += '/' + bassNoteString + bass.quality;
   }

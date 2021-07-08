@@ -212,6 +212,8 @@ const saveTextAsFile = (textToWrite, filename) => {
     document.body.appendChild(downloadLink);
   }
 
+  let song = new File(['Innhold'], 'FileNavn.txt', { type: 'text/plain' });
+
   downloadLink.click();
 };
 

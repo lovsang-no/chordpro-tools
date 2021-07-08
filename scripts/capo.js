@@ -4,7 +4,7 @@ const songWrapper = document.createElement('DIV');
 
 const callback = () => {
   songWrapper.innerHTML = songObjectToHtmlTable(song);
-  console.log(song);
+  console.log(song, song.transposeLogic.capoStep, song.transposeLogic.transposeStep);
 };
 
 song.setRenderCallback(callback);
