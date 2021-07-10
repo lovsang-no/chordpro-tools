@@ -1,4 +1,5 @@
 const song = newSongObjectFromTemplate(templateTest);
+song.displayLyrics();
 const target = document.getElementById('target');
 const songWrapper = document.createElement('DIV');
 

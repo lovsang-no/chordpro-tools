@@ -438,6 +438,7 @@ const sectionObjectToHtmlTable = (section, displayType) => {
  * @param {object} sectionObject
  */
 const sectionObjectToLyrics = (section) => {
+  console.log('her');
   const sectionBuffer = [];
   if (section.title) sectionBuffer.push(section.title.wrapHTML('div', 'cp-heading'));
 
@@ -642,7 +643,7 @@ const songObjectToHtmlTable = (songObject, bypassMeta = false, includeMetaKeys =
   const sectionsBuffer = [];
   songObject.sections.forEach((section) => {
     const sectionString =
-      displayType === DISPLAY_LYRICS
+      displayType.type === DISPLAY_LYRICS
         ? sectionObjectToLyrics(section, displayType)
         : sectionObjectToHtmlTable(section, displayType);
     if (sectionString) {
