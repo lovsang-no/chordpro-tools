@@ -552,21 +552,24 @@ const metadataObjectToHtml = (
   const showOriginalKey = showOriginalKeyDisplayTypes.indexOf(displayType.type) !== -1;
 
   const metaBuffer = [];
+  const keyTempoBuffer = [];
 
   if (metadata.title) metaBuffer.push(metadata.title.wrapHTML('div', 'cp-song-title'));
   if (metadata.artist) metaBuffer.push(metadata.artist.wrapHTML('div', 'cp-song-artist'));
   if (!excludeKey) {
     if (!showOriginalKey && transposeLogic.currentKeyObject)
-      metaBuffer.push(('Toneart: ' + transposeLogic.getDisplayKey()).wrapHTML('div'));
+      keyTempoBuffer.push(('Toneart: ' + transposeLogic.getDisplayKey()).wrapHTML('div'));
     if (showOriginalKey && transposeLogic.originalKeyObject)
-      metaBuffer.push(
+      keyTempoBuffer.push(
         ('Original toneart: ' + transposeLogic.originalKeyObject.key).wrapHTML('div')
       );
     if (transposeLogic.capoStep)
-      metaBuffer.push(('Capo: ' + transposeLogic.getDisplayCapo()).wrapHTML('div'));
+      keyTempoBuffer.push(('Capo: ' + transposeLogic.getDisplayCapo()).wrapHTML('div'));
   }
   if (metadata.tempo)
-    metaBuffer.push((metadata.tempo + ' BPM ' + (metadata.time ?? '')).wrapHTML('div'));
+    keyTempoBuffer.push((metadata.tempo + ' BPM ' + (metadata.time ?? '')).wrapHTML('div'));
+
+  metaBuffer.push(keyTempoBuffer.join('\n').wrapHTML('div', 'cp-key-tempo-wrapper'));
   for (let [key, value] of metadata.extra) {
     if (includeMetaKeys) {
       if (includeMetaKeys.indexOf(key.toUpperCase()) !== -1) {
