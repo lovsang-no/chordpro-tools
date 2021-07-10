@@ -570,10 +570,10 @@ const metadataObjectToHtml = (
   for (let [key, value] of metadata.extra) {
     if (includeMetaKeys) {
       if (includeMetaKeys.indexOf(key.toUpperCase()) !== -1) {
-        metaBuffer.push(key + ': ' + value);
+        metaBuffer.push((key + ': ' + value).wrapHTML('div'));
       }
     } else {
-      metaBuffer.push(key + ': ' + value);
+      metaBuffer.push((key + ': ' + value).wrapHTML('div'));
     }
   }
 
