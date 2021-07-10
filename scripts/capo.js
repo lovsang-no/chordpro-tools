@@ -3,7 +3,7 @@ const target = document.getElementById('target');
 const songWrapper = document.createElement('DIV');
 
 const callback = () => {
-  songWrapper.innerHTML = songObjectToHtmlTable(song);
+  songWrapper.innerHTML = songObjectToHtmlTable(song, false, []);
   console.log(song, song.transposeLogic.capoStep, song.transposeLogic.transposeStep);
 };
 

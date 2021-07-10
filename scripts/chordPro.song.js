@@ -539,7 +539,12 @@ const sectionObjectToChordPro = (section, originalString = true, translateHToB =
  * @param {*} transposeLogic
  * @returns
  */
-const metadataObjectToHtml = (metadata, transposeLogic, displayType) => {
+const metadataObjectToHtml = (
+  metadata,
+  transposeLogic,
+  displayType,
+  includeMetaKeys = undefined
+) => {
   /* Metadata start */
   const hideKeyDisplayTypes = [DISPLAY_LYRICS];
   const excludeKey = hideKeyDisplayTypes.indexOf(displayType.type) !== -1;
@@ -563,7 +568,13 @@ const metadataObjectToHtml = (metadata, transposeLogic, displayType) => {
   if (metadata.tempo)
     metaBuffer.push((metadata.tempo + ' BPM ' + (metadata.time ?? '')).wrapHTML('div'));
   for (let [key, value] of metadata.extra) {
-    metaBuffer.push((key + ': ' + value).wrapHTML('div'));
+    if (includeMetaKeys) {
+      if (includeMetaKeys.indexOf(key.toUpperCase()) !== -1) {
+        metaBuffer.push(key + ': ' + value);
+      }
+    } else {
+      metaBuffer.push(key + ': ' + value);
+    }
   }
 
   return metaBuffer.join('\n').wrapHTML('div', 'cp-meta-wrapper') + '<br>';
@@ -604,7 +615,7 @@ const metadataObjectToChordPro = (metadata, transposeLogic, includeMetaKeys = un
  * @param {modsong} songObject
  * @param {boolean} bypassMeta
  */
-const songObjectToHtmlTable = (songObject, bypassMeta = false) => {
+const songObjectToHtmlTable = (songObject, bypassMeta = false, includeMetaKeys = undefined) => {
   /* Return null if song object is not initialized */
   if (!songObject.initialized) {
     console.error('Failed to display song. Song object is not initialized.');
@@ -618,7 +629,8 @@ const songObjectToHtmlTable = (songObject, bypassMeta = false) => {
   const metadataString = metadataObjectToHtml(
     songObject.metadata,
     songObject.transposeLogic,
-    displayType
+    displayType,
+    includeMetaKeys
   );
   mainBuffer.push(metadataString);
   /* Metadata end */
@@ -634,7 +646,7 @@ const songObjectToHtmlTable = (songObject, bypassMeta = false) => {
       sectionsBuffer.push(sectionString);
     }
   });
-  mainBuffer.push(sectionsBuffer.join('\n').wrapHTML('div'));
+  mainBuffer.push(sectionsBuffer.join('\n').wrapHTML('div', 'cp-song-body'));
   /* Sections end */
 
   return mainBuffer.join('\n');
