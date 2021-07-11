@@ -67,7 +67,7 @@ const newSongObjectFromTemplate = (template, bypassMeta = false) => {
       const originalIndex = transposeLogic.originalKeyObject.listIndex;
       if (originalIndex === -1) throw new Error('Could not find key.');
       const newListIndex = modifiedModulo(
-        transposeLogic.transposeStep + originalIndex + transposeLogic.capoStep,
+        originalIndex + transposeLogic.transposeStep + transposeLogic.capoStep,
         transposeLogic.keys.length
       );
       const transposedKeyObject = transposeLogic.keys[newListIndex];
@@ -100,21 +100,24 @@ const newSongObjectFromTemplate = (template, bypassMeta = false) => {
     },
 
     getDisplayCapo: () => {
-      const currentKeyObject = transposeLogic.currentKeyObject;
+      const originalKeyObject = transposeLogic.originalKeyObject;
+      if (!originalKeyObject) {
+        console.error('Cannot get display capo. OriginalKeyObject not set.');
+        return;
+      }
+
       const newListIndex = modifiedModulo(
-        currentKeyObject.listIndex + transposeLogic.capoStep,
+        originalKeyObject.listIndex + transposeLogic.capoStep,
         transposeLogic.keys.length
       );
+
       const transposedKeyIndex = transposeLogic.keys[newListIndex]?.index;
 
-      actualCapoStep = modifiedModulo(transposedKeyIndex - currentKeyObject.index, 12);
-
-      console.log(
-        actualCapoStep,
-        currentKeyObject.index,
-        transposedKeyIndex,
-        transposeLogic.keys.length
+      const actualCapoStep = modifiedModulo(
+        transposedKeyIndex - originalKeyObject.index,
+        noteObjectList.length
       );
+
       return actualCapoStep;
     },
 
@@ -438,7 +441,6 @@ const sectionObjectToHtmlTable = (section, displayType) => {
  * @param {object} sectionObject
  */
 const sectionObjectToLyrics = (section) => {
-  console.log('her');
   const sectionBuffer = [];
   if (section.title) sectionBuffer.push(section.title.wrapHTML('div', 'cp-heading'));
 
@@ -507,14 +509,10 @@ const sectionObjectToChordPro = (section, originalString = true, translateHToB =
               : chordObjectToTransposedString(chordObject)
             : '';
           /* Translate H to B */
-          console.log(transposedChord);
           if (translateHToB && transposedChord.startsWith('H')) {
-            console.log(transposedChord);
             transposedChord = 'B' + transposedChord.substr(1);
-            console.log(transposedChord);
           }
           const lyricsString = lyrics ? lyrics : '';
-          console.log(transposedChord);
           let lyricsAndBracketedChords =
             (transposedChord ? transposedChord.wrapChord() : '') + lyricsString;
 

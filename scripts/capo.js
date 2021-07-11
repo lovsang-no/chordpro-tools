@@ -1,11 +1,10 @@
 const song = newSongObjectFromTemplate(templateTest);
-song.displayLyrics();
 const target = document.getElementById('target');
 const songWrapper = document.createElement('DIV');
 
 const callback = () => {
   songWrapper.innerHTML = songObjectToHtmlTable(song, false, []);
-  console.log(song, song.transposeLogic.capoStep, song.transposeLogic.transposeStep);
+  //console.log(song, song.transposeLogic.capoStep, song.transposeLogic.transposeStep);
 };
 
 song.setRenderCallback(callback);
